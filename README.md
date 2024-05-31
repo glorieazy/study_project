@@ -15,12 +15,12 @@ pip install -r requirements.txt
 
 Check that all following directories exist.
 
-extractions
-images
-segmentations
-results
-videos_annotated
-frames_landmark
+- extractions
+- images
+- segmentations
+- results
+- videos_annotated
+- frames_landmark
 
 If not, please create them. You may also create an additional "media" directory to store your videos. As paths are hard-coded at the moment, please make sure you've given the paths of your content correctly and that the directories above are in the project directory.
 
