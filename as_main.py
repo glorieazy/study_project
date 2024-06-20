@@ -1,95 +1,70 @@
-#################################
-### The main executable file ####
-#################################
+
 
 def main():
-    ######################
-    ### starts manager ###
-    ######################
-    from as_Videos_Manager import asVideosManager
-    manager = asVideosManager()
 
-    #####################
-    ### create config ###
-    #####################
-    from as_config import asConfig
-    config_json = asConfig("config/config.json")
-    # add it to manager
-    manager.add_config( config_json )
+    #manage videos and stuff
 
-    ##################
-    ### Read video ###
-    ##################    
-    manager.set_video(type_of_video="primary")
+
+
+
+    #find frames with bad landmarks
+
+    import os
+    import cv2
+    import numpy as np
+    from numpy.linalg import norm
+    import mediapipe as mp
+    from mediapipe import solutions
+    from mediapipe.framework.formats import landmark_pb2  
+
+    mp_pose = mp.solutions.pose
+
+    # Folders containing relevant images
+    frames_folder_path = 'frames'
+
+    # Get lists of image filenames from folder
+    frames_folder = [filename for filename in os.listdir(frames_folder_path) if filename.endswith(('.jpg', '.png', '.jpeg'))]
     
-    ############################
-    ### Set video parameters ###
-    ############################    
-    manager.init_param_video(type_of_video="primary")
-
-    ###################################
-    ### Decompose video into frames ###
-    ###################################
-    manager.decompose_video_into_frames(type_of_video="primary")
-
-    ################################
-    ### Dump/restore the manager ###
-    ################################
-    # dump manager
-    asVideosManager.dump( manager )
-    # load manager
-    manager = asVideosManager.load()
-    print()
-
-    manager.primary.frames[0].display_info()
-    manager.primary.frames[-1].display_info()
-
-
-    ################################
-    ### configure ImageProcessor ###
-    ################################
-    from as_ImageProcessor import asImageProcessor
-    image_processor = asImageProcessor()
-    image_processor.initialize_detector()
-    # add it to manager
-    manager.add_image_processor( image_processor )
-
-    ######################
-    ### process Frames ###
-    ######################
-    #image_processor.process_frame( "./frames/Daria_forhand.mp4_frame12.jpg" )
-    #print( "./frames/Daria_forhand.mp4_frame0.jpg" )
+    # Function for extracting the number from a frame
+    def extract_number(frame):
+       return int(''.join(filter(str.isdigit, frame)))
     
-    #manager.primary.frames[0].show_annotated_frame(image_processor)        
-    manager.primary.create_annotated_from_frames(image_processor, manager.config.get_value("dirs","frames_annotated"))
+    # Sort the frames after the numbers
+    frames_folder = sorted(frames_folder)
 
-    # created annotated movie from annotated frames in a spesific directory
-    manager.primary.create_video_annotated( manager.config.get_value("dirs","frames_annotated"), \
-                                            manager.config.get_value("dirs","videos_annotated"), to_show_frames=False)    
+    for index, image in enumerate(frames_folder):
 
-    #manager.primary._frames[0].show()
+        with mp_pose.Pose(
+            static_image_mode=True,
+            model_complexity=2,
+            enable_segmentation=True,
+            min_detection_confidence=0.5) as pose:
+                current_frames_path = os.path.join(frames_folder_path, image) 
+                current_image = cv2.imread(current_frames_path)
+                next_frame = next(frames_folder,'end')
+                next_frames_path = os.path.join(frames_folder_path,next_frame)
 
-    #from as_Frame import asFrame
-    #asFrame.show_frame( manager.primary._frames[0].get_segmentation_mask(),  text= manager.primary._frames[0].name)
-    #manager.primary._frames[0].show_segmentation_mask()
+                if next_frames_path == 'end':
+                    print('detecting bad frames done')
+                else:
+                    next_image = cv2.imread(next_frames_path)
 
-    print()
-    # test 
-    # resize frame
+                    # Convert the BGR image to RGB before processing
+                    results_1 = pose.process(cv2.cvtColor(current_image, cv2.COLOR_BGR2RGB))
+                    results_2 = pose.process(cv2.cvtColor(next_image, cv2.COLOR_BGR2RGB))
 
+                    nose_landmark_1 = results_1.pose_landmarks.landmark[mp_pose.PoseLandmark.NOSE] if results_1.pose_landmarks else None
+                    nose_landmark_2 = results_2.pose_landmarks.landmark[mp_pose.PoseLandmark.NOSE] if results_2.pose_landmarks else None
 
-# Check if this script is being run directly (not imported as a module)
-if __name__ == "__main__":
-    main()  # Call the main function
-
-
-
-    ####################
-    ### resize frame ###
-    ####################
-    # manager.primary.frames[0].show()
-    # shape = (1000, 800)
-    # manager.primary.frames[0].resize(shape, to_change_file=True)
-    # manager.primary.frames[0].show()
-    # print()
-
+                    # Check if nose landmarks are detected in both images
+                    if nose_landmark_1 and nose_landmark_2:
+                        dx = nose_landmark_1.x - nose_landmark_2.x
+                        dy = nose_landmark_1.y - nose_landmark_2.y  
+                        while dx > 0.05 | dx < -0.05 | dy > 0.05 | dy < -0.05 :
+                            print('bad pose detection in' + next_frames_path)
+                            next_frame = next(next_frame)
+                            next_frames_path = os.path.join(frames_folder_path,next(image,'end'))
+                    else:
+                        print('no nose detected')
+                             
+                    
