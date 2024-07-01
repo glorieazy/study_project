@@ -730,7 +730,7 @@ def main():
         #cut frames video2 at end with number higher length_video1
         for index in range (length_video1, length_video2):
             #name of the frames from secondary video
-            print(length_video2)
+            
             file_path = './secondary_frames_annotated/Teana_forhand_frame_' + str(index) + '.jpg'
             os.remove(file_path)
             file_path = './frames/Teana_forhand_frame_' + str(index) + '.jpg'
@@ -758,7 +758,7 @@ def main():
 
     
 
-    landmark_error = np.zeros(int(length_frames_folder/2))
+    landmark_error = np.zeros(int(length_frames_folder/2),dtype=float)
 
     if mark1 > mark2:
         start1 = mark1-mark2
@@ -802,6 +802,571 @@ def main():
 
 
 
+    '''WiMa Code'''
+
+
+
+
+
+
+    # Save errors in csv file
+    import pandas as pd 
+    
+    error = []
+
+    df = pd.DataFrame(error)
+    df.to_csv("error.csv")               
+                
+    
+    mp_pose = mp.solutions.pose
+
+    # Folders containing relevant images
+    frames_folder_path = 'frames'
+    #images_folder_path = 'secondary_frames_annotated'
+
+    # Get lists of image filenames from folder
+    frames_folder = [filename for filename in os.listdir(frames_folder_path) if filename.endswith(('.jpg', '.png', '.jpeg'))]
+    #images_folder = [filename for filename in os.listdir(images_folder_path) if filename.endswith(('.jpg', '.png', '.jpeg'))]
+    
+    
+    
+    # Sort the frames after the numbers
+    frames_folder = sorted(frames_folder)
+    #images_folder = sorted(images_folder, key=extract_number)
+
+    # Divide frames 
+    
+    primary_frames_folder = frames_folder[0:int(length_frames_folder/2)]
+    primary_frames_folder = sorted(primary_frames_folder, key=extract_number)
+    secondary_frames_folder = frames_folder[int(length_frames_folder/2):length_frames_folder]
+    secondary_frames_folder = sorted(secondary_frames_folder, key=extract_number)
+    
+    # Iterate over images pairwise from both folders
+    #for idx, (image1, image2, image3) in enumerate(zip(primary_frames_folder, secondary_frames_folder, images_folder)):
+    for idx, (image1, image2) in enumerate(zip(primary_frames_folder, secondary_frames_folder)):
+        
+        
+        with mp_pose.Pose(
+            static_image_mode=True,
+            model_complexity=2,
+            enable_segmentation=True,
+            min_detection_confidence=0.5) as pose:
+                primary_frames_path = os.path.join(frames_folder_path, image1) 
+                secondary_frames_path = os.path.join(frames_folder_path, image2) 
+                #image_path =  os.path.join(images_folder_path, image3)   
+                primary_image = cv2.imread(primary_frames_path)
+                secondary_image = cv2.imread(secondary_frames_path)
+                #frame = cv2.imread(image_path)
+                
+                # Convert the BGR image to RGB before processing.
+                results1 = pose.process(cv2.cvtColor(primary_image, cv2.COLOR_BGR2RGB))
+                results2 = pose.process(cv2.cvtColor(secondary_image, cv2.COLOR_BGR2RGB))    
+                
+                # Normalize error values
+                if landmark_error.max() > 0:
+                    errors_normalized = (landmark_error - landmark_error.min()) / (landmark_error.max() - landmark_error.min())
+                else:
+                    errors_normalized = landmark_error  
+                            
+                # Create color gradient
+                    
+                def custom_colormap():
+                    # Define colors
+                    green = np.array([0, 255, 0])  # Green
+                    yellow = np.array([0, 255, 255]) # Yellow
+                    red = np.array([0, 0, 255])     # Red
+                    
+                    # Create colormap
+                    cmap = np.zeros((256, 1, 3), dtype=np.uint8)
+                    for i in range(256):
+                        ratio = i / 255.0
+                        if ratio < 0.5:
+                            cmap[i, 0, :] = (1 - 2 * ratio) * green + (2 * ratio) * yellow
+                        else:
+                            cmap[i, 0, :] = (1 - ratio) * yellow + (2 * ratio - 1) * red
+                    
+                    return cmap
+                
+                colors = cv2.applyColorMap((errors_normalized * 255).astype(np.uint8), custom_colormap())
+                
+                for index, landmark2 in enumerate(results2.pose_landmarks.landmark):
+
+                    height, width, _ = secondary_image.shape
+                    #height, width, _ = frame.shape
+                    cx, cy = int(landmark2.x * width), int(landmark2.y * height)
+
+                    error = errors_normalized[index]
+
+                    # Adjust color base on error values
+                    color = tuple(map(int, colors[index][0]))
+                    
+                    # Draw landmarks
+                    image = cv2.circle(secondary_image, (cx, cy), 3, color, -1)
+                    #image = cv2.circle(frame, (cx, cy), 3, color, -1)
+
+                #landmark_error = []    
+
+        # Generate a unique filename for the combined image
+        image_filename = f'error_landmarks_{idx}.jpg'  
+                
+        # Save the resulting image
+        image_path = os.path.join('error_landmarks', image_filename)
+        cv2.imwrite(image_path, image)       
+                    
+    
+    # Draw landmarks on white background
+    
+    # import os
+    # import cv2
+    # import numpy as np
+    # import mediapipe as mp
+    # from mediapipe import solutions
+    # from mediapipe.framework.formats import landmark_pb2  
+
+    mp_pose = mp.solutions.pose
+
+    # Folders containing relevant images
+    frames_folder_path = 'frames'
+
+    # Get lists of image filenames from both folders
+    frames_folder = [filename for filename in os.listdir(frames_folder_path) if filename.endswith(('.jpg', '.png', '.jpeg'))]
+    
+    # Function for extracting the number from a frame
+    def extract_number(frame):
+       return int(''.join(filter(str.isdigit, frame)))
+    
+    # Sort the frames after the numbers
+    frames_folder = sorted(frames_folder)
+
+    # Divide frames 
+    end_index = 89
+    primary_frames_folder = frames_folder[end_index:]
+    primary_frames_folder = sorted(primary_frames_folder, key=extract_number)
+    secondary_frames_folder = frames_folder[:end_index]
+    secondary_frames_folder = sorted(secondary_frames_folder, key=extract_number)
+    
+    # Iterate over images pairwise from both folders
+    for idx, (image1, image2) in enumerate(zip(primary_frames_folder, secondary_frames_folder)):
+        
+        with mp_pose.Pose(
+            static_image_mode=True,
+            model_complexity=2,
+            enable_segmentation=True,
+            min_detection_confidence=0.5) as pose:
+                primary_frames_path = os.path.join(frames_folder_path, image1) 
+                secondary_frames_path = os.path.join(frames_folder_path, image2)   
+                primary_image = cv2.imread(primary_frames_path)
+                secondary_image = cv2.imread(secondary_frames_path)
+                # Convert the BGR image to RGB before processing.
+                results1 = pose.process(cv2.cvtColor(primary_image, cv2.COLOR_BGR2RGB))
+                results2 = pose.process(cv2.cvtColor(secondary_image, cv2.COLOR_BGR2RGB))
+            
+                
+        # Create white frame as canvas for the landmarks
+        
+        # Get the height and width of the frames
+        height1, width1 = primary_image.shape[:2]
+        height2, width2 = secondary_image.shape[:2]
+        primary_frame = np.full([height1, width1, 3], [255, 255, 255] , dtype=np.uint8)    
+        secondary_frame = np.full([height2, width2, 3], [255, 255, 255], dtype=np.uint8)               
+                
+        if results1.pose_landmarks is not None:
+            for landmark in results1.pose_landmarks.landmark:
+                #height, width, _ = frame.shape
+                cx, cy = int(landmark.x * width1), int(landmark.y * height1)
+                primary_image = cv2.circle(primary_frame, (cx, cy), 4, (0, 0, 255), -1)  # Draw a red circle at each landmark
+        
+        if results2.pose_landmarks is not None:
+            for landmark in results2.pose_landmarks.landmark:
+                #height, width, _ = frame.shape
+                cx, cy = int(landmark.x * width2), int(landmark.y * height2)
+                secondary_image = cv2.circle(secondary_frame, (cx, cy), 4, (0, 0, 255), -1)  # Draw a red circle at each landmark
+     
+
+        # Generate a unique filename for the image
+        primary_image_filename = f'primary_landmarks_{idx}.jpg'  
+        secondary_image_filename = f'secondary_landmarks_{idx}.jpg'  
+
+        # Save the resulting image
+        primary_image_path = os.path.join('frames_landmarks', primary_image_filename)
+        secondary_image_path = os.path.join('frames_landmarks', secondary_image_filename)
+        cv2.imwrite(primary_image_path, primary_image)  
+        cv2.imwrite(secondary_image_path, secondary_image)        
+
+
+
+
+    '''delete from here?
+
+
+
+
+
+    # Body Segmentation
+
+    import os
+    import cv2
+    import numpy as np
+    import torch
+    
+    # Load trained model
+    
+    model = torch.hub.load('pytorch/vision:v0.10.0', 'deeplabv3_resnet50', pretrained=True)
+    model.eval()
+
+    from PIL import Image
+    from torchvision import transforms
+
+    folder_path = 'frames'
+
+    # Get lists of image filenames from folder
+    folder_images = [filename for filename in os.listdir(folder_path) if filename.endswith(('.jpg', '.png', '.jpeg'))]
+    
+    # Function for extracting the number from a frame
+    def extract_number(frame):
+       return int(''.join(filter(str.isdigit, frame)))
+    
+    # Sort the frames after the numbers
+    folder_images = sorted(folder_images)
+
+    # Get relevant frames from secondary video
+    end_index = 89
+    folder_images = folder_images[:end_index]
+    folder_images = sorted(folder_images, key=extract_number)
+    
+    # Iterate over images from folder
+    for idx, image in enumerate(folder_images):
+        path = os.path.join(folder_path, image)
+        input_image = Image.open(path)
+        #input_image = Image.open('secondary_frames_annotated/Teana_forhand_frame_0.jpg')
+        input_image = input_image.convert("RGB")
+        preprocess = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            ])
+
+        input_tensor = preprocess(input_image)
+        input_batch = input_tensor.unsqueeze(0) # create a mini-batch as expected by the model
+
+        # move the input and model to GPU for speed if available
+        if torch.cuda.is_available():
+            input_batch = input_batch.to('cuda')
+            model.to('cuda')
+
+        with torch.no_grad():
+            output = model(input_batch)['out'][0]
+        output_predictions = output.argmax(0)
+
+        # Define the color for segmentation
+        white_color = torch.tensor([255, 255, 255])
+        gray_color = torch.tensor([192, 192, 192])
+
+        # Create a color palette for each class
+        palette = torch.tensor([[2 ** 25 - 1, 2 ** 15 - 1, 2 ** 21 - 1] for _ in range(21)])
+    
+        # Replace the first color (background color) with white
+        palette[0] = white_color
+        palette[1:] = gray_color
+    
+        # Generate colors for each class using the modified palette
+        colors = (palette).numpy().astype("uint8")
+
+        r = Image.fromarray(output_predictions.byte().cpu().numpy()).resize(input_image.size)
+        r.putpalette(colors)
+
+        # Convert the image to RGB mode before saving as JPG
+        r = r.convert('RGB')
+
+        # Generate a unique filename for the segmented frame
+        segmented_image_filename = f'segmented_frame_{idx}.jpg'  
+
+        # Save the resulting segmented image
+        segmented_image_path = os.path.join('segmented_frames', segmented_image_filename)
+        r.save(segmented_image_path)
+        
+
+    # Draw landmarks on the segmented frames 
+    
+    # import os
+    # import cv2
+    # import mediapipe as mp
+    # from mediapipe import solutions
+    # from mediapipe.framework.formats import landmark_pb2  
+
+    mp_pose = mp.solutions.pose
+
+    # Folders containing relevant images
+    frames_folder_path = 'frames'
+    segmented_folder_path = 'segmented_frames'
+
+    # Get lists of image filenames from both folders
+    frames_folder = [filename for filename in os.listdir(frames_folder_path) if filename.endswith(('.jpg', '.png', '.jpeg'))]
+    segmented_folder = [filename for filename in os.listdir(segmented_folder_path) if filename.endswith(('.jpg', '.png', '.jpeg'))]
+
+    # Function for extracting the number from a frame
+    def extract_number(frame):
+       return int(''.join(filter(str.isdigit, frame)))
+    
+    # Sort the frames after the numbers
+    frames_folder = sorted(frames_folder)
+    segmented_folder = sorted(segmented_folder, key=extract_number)
+
+    # Get relevant frames from secondary video
+    #start_index = 65
+    #frames_folder = frames_folder[start_index:]
+    end_index = 89
+    frames_folder = frames_folder[:end_index]
+    frames_folder = sorted(frames_folder, key=extract_number)
+    
+    # Iterate over images pairwise from both folders
+    for idx, (image1, image2) in enumerate(zip(frames_folder, segmented_folder)):
+        
+        with mp_pose.Pose(
+            static_image_mode=True,
+            model_complexity=2,
+            enable_segmentation=True,
+            min_detection_confidence=0.5) as pose:
+                frames_path = os.path.join(frames_folder_path, image1)   
+                image = cv2.imread(frames_path)
+                # Convert the BGR image to RGB before processing.
+                results = pose.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+            
+            
+        segmented_path = os.path.join(segmented_folder_path, image2)    
+        frame = cv2.imread(segmented_path) 
+
+        if results.pose_landmarks is not None:
+            for landmark in results.pose_landmarks.landmark:
+                height, width, _ = frame.shape
+                cx, cy = int(landmark.x * width), int(landmark.y * height)
+                image = cv2.circle(frame, (cx, cy), 4, (0, 0, 255), -1)  # Draw a red circle at each landmark
+
+        # Generate a unique filename for the combined image
+        image_filename = f'segmented_frame_annotated_{idx}.jpg'  
+
+        # Save the resulting image
+        image_path = os.path.join('segmented_frames_annotated', image_filename)
+        cv2.imwrite(image_path, image)        
+    
+
+    # Overlay images for comparison
+
+    # import cv2
+    # import numpy as np
+    
+    # MediaPipe Pose Estimation initialization
+    mp_pose = mp.solutions.pose
+    pose = mp_pose.Pose(static_image_mode=True, 
+                        model_complexity=2, 
+                        enable_segmentation=True,
+                        min_detection_confidence=0.5)
+
+    # Extract landmarks
+    landmark_image1 = cv2.imread('frames/Daria_forhand_frame_0.jpg')
+    landmark_image2 = cv2.imread('frames/Tanea_forhand_frame_0.jpg')
+
+    # Adjust image shape for comparison
+    landmark_image2 = cv2.resize(landmark_image2,(400, 720)) # Original shape: (848, 480, 3)
+
+    # Perform pose estimation on the first image and find the landmarks
+    results1 = pose.process(cv2.cvtColor(landmark_image1, cv2.COLOR_BGR2RGB))
+    nose_landmark_1 = results1.pose_landmarks.landmark[mp_pose.PoseLandmark.NOSE] if results1.pose_landmarks else None
+    left_heel_landmark1 = results1.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_HEEL] if results1.pose_landmarks else None
+    right_heel_landmark1 = results1.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_HEEL] if results1.pose_landmarks else None
+
+    # Perform pose estimation on the second image and find the landmarks
+    results2 = pose.process(cv2.cvtColor(landmark_image2, cv2.COLOR_BGR2RGB))
+    nose_landmark_2 = results2.pose_landmarks.landmark[mp_pose.PoseLandmark.NOSE] if results2.pose_landmarks else None
+    left_heel_landmark2 = results2.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_HEEL] if results1.pose_landmarks else None
+    right_heel_landmark2 = results2.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_HEEL] if results1.pose_landmarks else None
+
+    # Folders containing relevant images
+    primary_frames_folder_path = 'primary_frames_annotated'
+    segmented_folder_path = 'segmented_frames_annotated'
+    #segmented_folder_path = 'secondary_frames_annotated'
+
+    # Get lists of image filenames from both folders
+    primary_frames_folder = [filename for filename in os.listdir(primary_frames_folder_path) if filename.endswith(('.jpg', '.png', '.jpeg'))]
+    segmented_folder = [filename for filename in os.listdir(segmented_folder_path) if filename.endswith(('.jpg', '.png', '.jpeg'))]
+
+    # Sort the frames after the numbers
+    primary_frames_folder = sorted(primary_frames_folder, key=extract_number)
+    segmented_folder = sorted(segmented_folder, key=extract_number)
+
+
+
+    delete untill here?
+
+
+
+
+    # Iterate over images pairwise from both folders
+    for idx, (image1, image2) in enumerate(zip(primary_frames_folder, segmented_folder)):
+        
+        primary_frames_path = os.path.join(primary_frames_folder_path, image1)   
+        image1 = cv2.imread(primary_frames_path, cv2.IMREAD_UNCHANGED)
+        image1 = cv2.cvtColor(image1,cv2.COLOR_BGR2BGRA)               # Add alpha channel
+        segmented_path = os.path.join(segmented_folder_path, image2)   
+        image2 = cv2.imread(segmented_path, cv2.IMREAD_UNCHANGED)
+        image2 = cv2.cvtColor(image2,cv2.COLOR_BGR2BGRA)               # Add alpha channel
+
+        # Resize image for aligning the body
+        image2 = cv2.resize(image2,(400, 720)) # Original shape: (848, 480, 3)
+            
+        
+        # Compute relevant region around both bodies for overlaying
+
+        nose_y_1 = int(nose_landmark_1.y * image1.shape[0])        # reference point for the top edge of the first region
+        nose_y_2 = int(nose_landmark_2.y * image2.shape[0])        # reference point for the top edge of the second region
+
+        l_heel_x_1 = int(left_heel_landmark1.x * image1.shape[1])  # reference point for the left edge of the first region
+        l_heel_x_2 = int(left_heel_landmark2.x * image2.shape[1])  # reference point for the left edge of the second region
+        l_heel_y_1 = int(left_heel_landmark1.y * image1.shape[0])  # reference point for the bottom edge of the first region
+        l_heel_y_2 = int(left_heel_landmark2.y * image2.shape[0])  # reference point for the bottom edge of the second region
+        
+        r_heel_x_1 = int(right_heel_landmark1.x * image1.shape[1]) # reference point for the right edge of the first region
+        r_heel_x_2 = int(right_heel_landmark2.x * image2.shape[1]) # reference point for the right edge of the second region
+        r_heel_y_1 = int(right_heel_landmark1.y * image1.shape[0]) # reference point for the bottom edge of the first region
+        r_heel_y_2 = int(right_heel_landmark2.y * image2.shape[0]) # reference point for the bottom edge of the second region
+        
+        # Adjust the reference points to get the regions surrounding the corresponding body in all frames
+        
+        right_x_1 = r_heel_x_1 - 120                         
+        left_x_1 = l_heel_x_1 + 50
+        bottom_y_1 = max(r_heel_y_1 + 30 ,l_heel_y_1 + 30)
+        top_y_1 = nose_y_1 - 120
+
+        right_x_2 = r_heel_x_2 - 120
+        left_x_2 = l_heel_x_2 + 35
+        bottom_y_2 = max(r_heel_y_2 + 30 ,l_heel_y_2 + 30)
+        top_y_2 = nose_y_2 - 120
+        
+        diff_x = left_x_1-right_x_1 - (left_x_2-right_x_2) 
+        diff_y = bottom_y_1 - top_y_1 - (bottom_y_2-top_y_2)
+        
+        alpha = 0.5  # Factor for transparency
+
+        # Distribute the differences in width and height of both regions evenly
+
+        if diff_x < 0:
+            diff_x = - diff_x
+            rest_x = -(diff_x % 4)
+        else:
+            rest_x = diff_x % 4
+        
+        if diff_y < 0:
+            diff_y = - diff_y
+            rest_y = -(diff_y % 4)    
+        else:
+            rest_y = diff_y % 4
+
+        if (diff_x % 4 != 0) and (diff_y % 4 != 0):
+            image1[top_y_1+int(diff_y/4):bottom_y_1-int(diff_y/4), right_x_1+int(diff_x/4):left_x_1-int(diff_x/4), :] = np.uint8(
+                image1[top_y_1+int(diff_y/4):bottom_y_1-int(diff_y/4), right_x_1+int(diff_x/4):left_x_1-int(diff_x/4), :] * alpha +  
+                image2[top_y_2-int(diff_y/4)-rest_y:bottom_y_2+int(diff_y/4), right_x_2-int(diff_x/4)-rest_x:left_x_2+int(diff_x/4), :]   * (1-alpha)
+            )
+        elif (diff_x % 4) != 0:
+            image1[top_y_1+int(diff_y/4):bottom_y_1-int(diff_y/4), right_x_1+int(diff_x/4):left_x_1-int(diff_x/4), :] = np.uint8(
+                image1[top_y_1+int(diff_y/4):bottom_y_1-int(diff_y/4), right_x_1+int(diff_x/4):left_x_1-int(diff_x/4), :] * alpha +  
+                image2[top_y_2-int(diff_y/4):bottom_y_2+int(diff_y/4), right_x_2-int(diff_x/4)-rest_x:left_x_2+int(diff_x/4), :]   * (1-alpha)
+            )  
+        elif (diff_y % 4) != 0:
+            image1[top_y_1+int(diff_y/4):bottom_y_1-int(diff_y/4), right_x_1+int(diff_x/4):left_x_1-int(diff_x/4), :] = np.uint8(
+                image1[top_y_1+int(diff_y/4):bottom_y_1-int(diff_y/4), right_x_1+int(diff_x/4):left_x_1-int(diff_x/4), :] * alpha +  
+                image2[top_y_2-int(diff_y/4)-rest_y:bottom_y_2+int(diff_y/4), right_x_2-int(diff_x/4):left_x_2+int(diff_x/4), :]   * (1-alpha)
+            )         
+        else:
+            image1[top_y_1+int(diff_y/4):bottom_y_1-int(diff_y/4), right_x_1+int(diff_x/4):left_x_1-int(diff_x/4), :] = np.uint8(
+                image1[top_y_1+int(diff_y/4):bottom_y_1-int(diff_y/4), right_x_1+int(diff_x/4):left_x_1-int(diff_x/4), :] * alpha +  
+                image2[top_y_2-int(diff_y/4):bottom_y_2+int(diff_y/4), right_x_2-int(diff_x/4):left_x_2+int(diff_x/4), :]   * (1-alpha)
+            )     
+        
+
+        # Generate a unique filename for the combined image
+        combined_image_filename = f'combined_image_{idx}.jpg'  
+
+        # Save the resulting combined image 
+        combined_image_path = os.path.join('frames_annotated', combined_image_filename)
+        cv2.imwrite(combined_image_path, image1)'''
+
+
+
+    # created annotated movie from annotated frames
+    
+    import cv2
+    import os
+
+    # Directory containing frames
+    primary_frames_dir = 'primary_frames_annotated'
+    secondary_frames_dir = 'secondary_frames_annotated'
+    comparison_frames_dir = 'frames_annotated'
+
+    # Output video file name
+    primary_video_filename = 'primary_video.mp4'
+    secondary_video_filename = 'secondary_video.mp4'
+    comparison_video_filename = 'comparison_video.mp4'
+
+    # Get the list of frames in the directory
+    primary_frames = [f for f in os.listdir(primary_frames_dir) if f.endswith('.jpg')]
+    secondary_frames = [f for f in os.listdir(secondary_frames_dir) if f.endswith('.jpg')]
+    comparison_frames = [f for f in os.listdir(comparison_frames_dir) if f.endswith('.jpg')]
+
+    # Sort the frames to ensure correct order
+
+    # Function for extracting the number from a frame
+    def extract_number(frame):
+        return int(''.join(filter(str.isdigit, frame)))
+
+    # Sort the frames after the numbers
+    primary_frames = sorted(primary_frames, key=extract_number)
+    secondary_frames = sorted(secondary_frames, key=extract_number)
+    comparison_frames = sorted(comparison_frames, key=extract_number)
+    
+    # Get the first frame to obtain frame size information
+    primary_frame_path = os.path.join(primary_frames_dir, primary_frames[0])
+    primary_frame = cv2.imread(primary_frame_path)
+    primary_height, primary_width, primary_layers = primary_frame.shape
+
+    secondary_frame_path = os.path.join(secondary_frames_dir, secondary_frames[0])
+    secondary_frame = cv2.imread(secondary_frame_path)
+    secondary_height, secondary_width, secondary_layers = secondary_frame.shape
+
+    comparison_frame_path = os.path.join(comparison_frames_dir, comparison_frames[0])
+    comparison_frame = cv2.imread(comparison_frame_path)
+    comparison_height, comparison_width, comparison_layers = comparison_frame.shape
+
+    # Define the codec and create a VideoWriter object
+    video_path = 'videos_annotated'
+    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    primary_video = cv2.VideoWriter(video_path+'/primary_video.mp4', fourcc, 30.0, (primary_width, primary_height))
+    secondary_video = cv2.VideoWriter(video_path+'/secondary_video.mp4', fourcc, 30.0, (secondary_width, secondary_height))
+    comparison_video = cv2.VideoWriter(video_path+'/comparison_video.mp4', fourcc, 5.0, (comparison_width, comparison_height))
+
+    # Loop through the frames and add them to the video
+    for frame_name in primary_frames:
+        primary_frame_path = os.path.join(primary_frames_dir, frame_name)
+        primary_frame = cv2.imread(primary_frame_path)
+        primary_video.write(primary_frame)
+
+    for frame_name in secondary_frames:
+        secondary_frame_path = os.path.join(secondary_frames_dir, frame_name)
+        secondary_frame = cv2.imread(secondary_frame_path)
+        secondary_video.write(secondary_frame)    
+    
+    for frame_name in comparison_frames:
+        comparison_frame_path = os.path.join(comparison_frames_dir, frame_name)
+        comparison_frame = cv2.imread(comparison_frame_path)
+        comparison_video.write(comparison_frame)
+
+    # Release the VideoWriter and close all OpenCV windows
+    primary_video.release()
+    secondary_video.release()
+    comparison_video.release()
+    cv2.destroyAllWindows()
+
+    print(f'Video {primary_video_filename} created successfully.')
+    print(f'Video {secondary_video_filename} created successfully.')
+    print(f'Video {comparison_video_filename} created successfully.')
 
 
 
