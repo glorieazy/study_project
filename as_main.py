@@ -18,9 +18,9 @@ def main():
     config_json = asConfig("config/config.json")
     manager = asVideosManager( asConfig("config/config.json") )
     manager.primary = asVideo( dir=manager.config.get_value("dirs","media"),  
-                                name="nadal_serve.mp4") 
+                                name="Daria_forhand.mp4") 
     manager.secondary = asVideo( dir=manager.config.get_value("dirs","media"),  
-                                  name="jonas_serve.mp4") 
+                                  name="Teana_forhand.mp4") 
     
     
     ########################
@@ -111,7 +111,7 @@ def main():
     for path in os.listdir(dir_path):
         # check if current path is a file
         if os.path.isfile(os.path.join(dir_path, path)):
-            if 'jonas' in path:
+            if 'Daria' in path:
                 number += 1
 
     length_video1 = number
@@ -284,7 +284,7 @@ def main():
                     dy = right_wrist_landmark_1.y - right_wrist_landmark_2.y  
                     counter = 0
                     if right_wrist_landmark_1.x < highest_hand1 :
-                        highest_hand1 = right_wrist_landmark_1
+                        highest_hand1 = right_wrist_landmark_1.x
                         mark1 = index
                     # Check if landmarks move unrealisticly much
                     while dx > 0.05 or dx < -0.05 or dy > 0.05 or dy < -0.05 :
@@ -570,7 +570,7 @@ def main():
                     dy = right_wrist_landmark_1.y - right_wrist_landmark_2.y  
                     counter = 0
                     if right_wrist_landmark_1.x < highest_hand2 :
-                        highest_hand2 = right_wrist_landmark_1
+                        highest_hand2 = right_wrist_landmark_1.x
                         mark2 = index - number
                     # Check if landmarks move unrealisticly much
                     while dx > 0.05 or dx < -0.05 or dy > 0.05 or dy < -0.05 :
@@ -700,13 +700,17 @@ def main():
     if mark1 > mark2:
         for i in range (0, mark1-mark2):
             #name of the frames from primary video
-            file_path = './primary_frames_annotated/nadal_serve_frame_' + str(i) + '.jpg'
+            file_path = './primary_frames_annotated/Daria_forhand_frame_' + str(i) + '.jpg'
             os.remove(file_path)
-            length_video1 = length_video1 - mark1 +mark2 
+            file_path = './frames/Daria_forhand_frame_' + str(i) + '.jpg'
+            os.remove(file_path)
+            length_video1 = length_video1 - mark1 + mark2 
     else:
         for index in range (0, mark2-mark1):
             #name of the frames from secondary video
-            file_path = './secondary_frames_annotated/jonas_serve_frame_' + str(i) + '.jpg'
+            file_path = './secondary_frames_annotated/Teana_forhand_frame_' + str(index) + '.jpg'
+            os.remove(file_path)
+            file_path = './frames/Teana_forhand_frame_' + str(index) + '.jpg'
             os.remove(file_path)
         #cut frames from video 2 at start amount of frames needed to be cut: mark2-mak1
 
@@ -718,33 +722,43 @@ def main():
     if length_video1 > length_video2:
         for i in range (length_video2, length_video1):
             #name of the frames from primary video
-            file_path = './primary_frames_annotated/nadal_serve_frame_' + str(i) + '.jpg'
+            file_path = './primary_frames_annotated/Daria_forhand_frame_' + str(i) + '.jpg'
+            os.remove(file_path)
+            file_path = './frames/Daria_forhand_frame_' + str(i) + '.jpg'
             os.remove(file_path)
     else:
         #cut frames video2 at end with number higher length_video1
-        for i in range (length_video1, length_video2):
+        for index in range (length_video1, length_video2):
             #name of the frames from secondary video
-            file_path = './secondary_frames_annotated/jonas_serve_frame_' + str(i) + '.jpg'
+            print(length_video2)
+            file_path = './secondary_frames_annotated/Teana_forhand_frame_' + str(index) + '.jpg'
+            os.remove(file_path)
+            file_path = './frames/Teana_forhand_frame_' + str(index) + '.jpg'
             os.remove(file_path)
 
 
     # Folders containing relevant images
+    #frames_folder_path_1 = 'primary_frames_annotated'
+    #frames_folder_path_2 = 'secondary_frames_annotated'
     frames_folder_path = 'frames'
 
     # Get lists of image filenames from folder
+    #frames_folder_1 = [filename for filename in os.listdir(frames_folder_path_1) if filename.endswith(('.jpg', '.png', '.jpeg'))]
+    #frames_folder_2 = [filename for filename in os.listdir(frames_folder_path_2) if filename.endswith(('.jpg', '.png', '.jpeg'))]
     frames_folder = [filename for filename in os.listdir(frames_folder_path) if filename.endswith(('.jpg', '.png', '.jpeg'))]
+
     
-    # Function for extracting the number from a frame
-    def extract_number(frame):
-       return int(''.join(filter(str.isdigit, frame)))
     
     # Sort the frames after the numbers
+    #primary_frames_folder = sorted(frames_folder_1)
+    #secondary_frames_folder = sorted(frames_folder_2)
     frames_folder = sorted(frames_folder)
 
     length_frames_folder = len(frames_folder)        
 
+    
 
-    landmark_error = np.zeros((length_frames_folder/2))
+    landmark_error = np.zeros(int(length_frames_folder/2))
 
     if mark1 > mark2:
         start1 = mark1-mark2
@@ -760,24 +774,31 @@ def main():
         end2 = length_video1 + length_video1 + abs(mark1-mark2)
 
 
-    for j in range(0,length_frames_folder/2):
+    for j in range(0,int(length_frames_folder/2)):
         x_offset = landmark_positioning_nose_1[0,start1+j] - landmark_positioning_nose_1[0,start2+j]
         y_offset = landmark_positioning_nose_1[1,start1+j] - landmark_positioning_nose_1[1,start2+j]
 
-        image = frames_folder[j]
-        current_frames_path = os.path.join(frames_folder_path, image) 
-        current_image = cv2.imread(current_frames_path)
-        results_1 = pose.process(cv2.cvtColor(current_image, cv2.COLOR_BGR2RGB))
+        
+        with mp_pose.Pose(
+            static_image_mode=True,
+            model_complexity=2,
+            enable_segmentation=True,
+            min_detection_confidence=0.5) as pose:
 
-        next_frame = frames_folder[length_frames_folder/2 + j]
-        next_frames_path = os.path.join(frames_folder_path,next_frame)
-        next_image = cv2.imread(next_frames_path)
-        results_2 = pose.process(cv2.cvtColor(next_image, cv2.COLOR_BGR2RGB))
+                primary_frame = frames_folder[j]
+                primary_frames_path = os.path.join(frames_folder_path, primary_frame) 
+                primary_image = cv2.imread(primary_frames_path)
+                results_1 = pose.process(cv2.cvtColor(primary_image, cv2.COLOR_BGR2RGB))
 
-        for (landmark1, landmark2) in zip(results_1.pose_landmarks.landmark, results_2.pose_landmarks.landmark):
-            x_error = landmark1.x - landmark2.x - x_offset
-            y_error = landmark1.y - landmark2.y - y_offset
-            landmark_error[j] = norm([x_error, y_error]) ** 2
+                secondary_frame = frames_folder[int(length_frames_folder/2)+j]
+                secondary_frames_path = os.path.join(frames_folder_path,secondary_frame)
+                secondary_image = cv2.imread(secondary_frames_path)
+                results_2 = pose.process(cv2.cvtColor(secondary_image, cv2.COLOR_BGR2RGB))
+
+                for (landmark1, landmark2) in zip(results_1.pose_landmarks.landmark, results_2.pose_landmarks.landmark):
+                    x_error = landmark1.x - landmark2.x - x_offset
+                    y_error = landmark1.y - landmark2.y - y_offset
+                    landmark_error[j] = norm([x_error, y_error]) ** 2
 
 
 
