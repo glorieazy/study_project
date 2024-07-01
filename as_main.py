@@ -754,6 +754,12 @@ def main():
 
 '''
 
+    # frame number and height for highest hand point for time synchronizing
+    mark1=0 
+    highest_hand1=0
+    mark2=0
+    highest_hand2=0
+
 
     for index in range(1,frames_folder.count+1):
 
@@ -771,6 +777,11 @@ def main():
 
                 if next_frames_path == 'end':
                     print('detecting bad frames done')
+                    
+                    #getting amount of frames in video
+                    length_video1=index
+
+                    
                     break
                 else:
                     next_image = cv2.imread(next_frames_path)
@@ -795,6 +806,11 @@ def main():
                     right_ankle_landmark_1 = results_1.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_ANKLE] if results_1.pose_landmarks else None
                     right_ankle_landmark_2 = results_2.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_ANKLE] if results_2.pose_landmarks else None
 
+
+                    
+
+                    
+                    
                     # Check if nose landmarks are detected in both images
                     if nose_landmark_1 and nose_landmark_2:
                         dx = nose_landmark_1.x - nose_landmark_2.x
@@ -869,6 +885,16 @@ def main():
                             if next_frames_path == 'end':
                                 print('Detecting bad right wrist frames done')
                                 break
+                            
+                            else:
+                                #getting height for the right hand primary video change x for y depending if serve or forehand
+                                if right_wrist_landmark_1.x > highest_hand1 :
+                                    highest_hand1 = right_wrist_landmark_1
+                                    mark1 = index
+
+                                #getting height for the right hand secondary video
+                            
+
                             next_image = cv2.imread(next_frames_path)
                             results_2 = pose.process(cv2.cvtColor(next_image, cv2.COLOR_BGR2RGB))
                             right_wrist_landmark_2 = results_2.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_WRIST] if results_2.pose_landmarks else None
@@ -940,9 +966,48 @@ def main():
                                 break        
                     else:
                         print('No right ankle detected')
-                    
 
 
+
+
+
+
+
+
+    #time synchronizing (code here isnt working yet, neeeds support for secondary video in detecting bad frames)
+
+    #cutting frames at the front so that the moment for synchronizing is at the same frame number (cutting frames isnt working yet)
+    if mark1 > mark2:
+        for i in range (0, mark1-mark2):
+            #name of the frames from primary video
+            file_path = './frames_annotated/Daria_forhand_frame_' + str(i) + '.jpg'
+            os.remove(file_path)
+            length_video1 = length_video1 - mark1 +mark2 
+    else:
+        for index in range (0, mark2-mark1):
+            #name of the frames from secindary video
+            file_path = './frames_annotated/Daria_forhand_frame_' + str(i) + '.jpg'
+            os.remove(file_path)
+        #cut frames from video 2 at start amount of frames needed to be cut: mark2-mak1
+
+        #updating video length
+        length_video2 = length_video2 - mark2 + mark1
+
+
+    #cutting frames at the end so that both video have same length
+    if length_video1 > length_video2:
+        for i in range (length_video2, length_video1):
+            #name of the frames from primary video
+            file_path = './frames_annotated/Daria_forhand_frame_' + str(i) + '.jpg'
+            os.remove(file_path)
+    else:
+        #cut frames video2 at end with number higher length_video1
+        for i in range (length_video1, length_video2):
+            #name of the frames from secondary video
+            file_path = './frames_annotated/Daria_forhand_frame_' + str(i) + '.jpg'
+            os.remove(file_path)
+
+    
 
 
 
