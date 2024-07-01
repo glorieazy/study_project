@@ -114,20 +114,23 @@ def main():
             if 'jonas' in path:
                 number += 1
 
+    length_video1 = number
+    length_video2 = length_frames_folder - number            
+
     landmark_positioning_nose_1 = np.zeros((2,length_frames_folder),dtype = float)
-    landmark_positioning_nose_2 = np.zeros((2,length_frames_folder/2),dtype = float)
+    #landmark_positioning_nose_2 = np.zeros((2,length_frames_folder/2),dtype = float)
 
     landmark_positioning_left_wrist_1 = np.zeros((2,length_frames_folder),dtype = float)
-    landmark_positioning_left_wrist_2 = np.zeros((2,length_frames_folder/2),dtype = float)
+    #landmark_positioning_left_wrist_2 = np.zeros((2,length_frames_folder/2),dtype = float)
 
     landmark_positioning_right_wrist_1 = np.zeros((2,length_frames_folder),dtype = float)
-    landmark_positioning_right_wrist_2 = np.zeros((2,length_frames_folder/2),dtype = float)
+    #landmark_positioning_right_wrist_2 = np.zeros((2,length_frames_folder/2),dtype = float)
 
     landmark_positioning_left_ankle_1 = np.zeros((2,length_frames_folder),dtype = float)
-    landmark_positioning_left_ankle_2 = np.zeros((2,length_frames_folder/2),dtype = float)
+    #landmark_positioning_left_ankle_2 = np.zeros((2,length_frames_folder/2),dtype = float)
 
     landmark_positioning_right_ankle_1 = np.zeros((2,length_frames_folder),dtype = float)
-    landmark_positioning_right_ankle_2 = np.zeros((2,length_frames_folder/2),dtype = float)
+    #landmark_positioning_right_ankle_2 = np.zeros((2,length_frames_folder/2),dtype = float)
     mark1=0 
     highest_hand1=0
     mark2=0
@@ -197,7 +200,7 @@ def main():
                     counter = 0
                     '''change (interpolate) coordinates nose_landmark_between.x or y to point between nose_landmark_1.x or y und nose_landmark_2.x or y with help of counter if more than one frame is bad'''
                     # Check if landmarks move unrealisticly much
-                    while dx > 0.02 | dx < -0.02 | dy > 0.02 | dy < -0.02 :
+                    while dx > 0.02 or dx < -0.02 or dy > 0.02 or dy < -0.02 :
                         counter = counter + 1
                         if counter  == 5:
                             print('Possibly the worst video quality ever. Try a new video.')
@@ -239,7 +242,7 @@ def main():
                     counter = 0
                     
                     # Check if landmarks move unrealisticly much
-                    while dx > 0.05 | dx < -0.05 | dy > 0.05 | dy < -0.05 :
+                    while dx > 0.05 or dx < -0.05 or dy > 0.05 or dy < -0.05 :
                         counter = counter + 1
                         if counter  == 5:
                             print('Possibly the worst video quality ever. Try a new video.')
@@ -284,7 +287,7 @@ def main():
                         highest_hand1 = right_wrist_landmark_1
                         mark1 = index
                     # Check if landmarks move unrealisticly much
-                    while dx > 0.05 | dx < -0.05 | dy > 0.05 | dy < -0.05 :
+                    while dx > 0.05 or dx < -0.05 or dy > 0.05 or dy < -0.05 :
                         counter = counter + 1
                         if counter  == 5:
                             print('Possibly the worst video quality ever. Try a new video.')
@@ -328,7 +331,7 @@ def main():
                     counter = 0
                     
                     # Check if landmarks move unrealisticly much
-                    while dx > 0.03 | dx < -0.03 | dy > 0.03 | dy < -0.03 :
+                    while dx > 0.03 or dx < -0.03 or dy > 0.03 or dy < -0.03 :
                         counter = counter + 1
                         if counter  == 5:
                             print('Possibly the worst video quality ever. Try a new video.')
@@ -371,7 +374,7 @@ def main():
                     counter = 0
                     
                     # Check if landmarks move unrealisticly much
-                    while dx > 0.03 | dx < -0.03 | dy > 0.03 | dy < -0.03 :
+                    while dx > 0.03 or dx < -0.03 or dy > 0.03 or dy < -0.03 :
                         counter = counter + 1
                         if counter  == 5:
                             print('Possibly the worst video quality ever. Try a new video.')
@@ -483,7 +486,7 @@ def main():
                     counter = 0
                     '''change (interpolate) coordinates nose_landmark_between.x or y to point between nose_landmark_1.x or y und nose_landmark_2.x or y with help of counter if more than one frame is bad'''
                     # Check if landmarks move unrealisticly much
-                    while dx > 0.02 | dx < -0.02 | dy > 0.02 | dy < -0.02 :
+                    while dx > 0.02 or dx < -0.02 or dy > 0.02 or dy < -0.02 :
                         counter = counter + 1
                         if counter  == 5:
                             print('Possibly the worst video quality ever. Try a new video.')
@@ -525,7 +528,7 @@ def main():
                     counter = 0
                     
                     # Check if landmarks move unrealisticly much
-                    while dx > 0.05 | dx < -0.05 | dy > 0.05 | dy < -0.05 :
+                    while dx > 0.05 or dx < -0.05 or dy > 0.05 or dy < -0.05 :
                         counter = counter + 1
                         if counter  == 5:
                             print('Possibly the worst video quality ever. Try a new video.')
@@ -570,7 +573,7 @@ def main():
                         highest_hand2 = right_wrist_landmark_1
                         mark2 = index - number
                     # Check if landmarks move unrealisticly much
-                    while dx > 0.05 | dx < -0.05 | dy > 0.05 | dy < -0.05 :
+                    while dx > 0.05 or dx < -0.05 or dy > 0.05 or dy < -0.05 :
                         counter = counter + 1
                         if counter  == 5:
                             print('Possibly the worst video quality ever. Try a new video.')
@@ -614,7 +617,7 @@ def main():
                     counter = 0
                     
                     # Check if landmarks move unrealisticly much
-                    while dx > 0.03 | dx < -0.03 | dy > 0.03 | dy < -0.03 :
+                    while dx > 0.03 or dx < -0.03 or dy > 0.03 or dy < -0.03 :
                         counter = counter + 1
                         if counter  == 5:
                             print('Possibly the worst video quality ever. Try a new video.')
@@ -657,7 +660,7 @@ def main():
                     counter = 0
                     
                     # Check if landmarks move unrealisticly much
-                    while dx > 0.03 | dx < -0.03 | dy > 0.03 | dy < -0.03 :
+                    while dx > 0.03 or dx < -0.03 or dy > 0.03 or dy < -0.03 :
                         counter = counter + 1
                         if counter  == 5:
                             print('Possibly the worst video quality ever. Try a new video.')
@@ -697,13 +700,13 @@ def main():
     if mark1 > mark2:
         for i in range (0, mark1-mark2):
             #name of the frames from primary video
-            file_path = './frames_annotated/Daria_forhand_frame_' + str(i) + '.jpg'
+            file_path = './primary_frames_annotated/nadal_serve_frame_' + str(i) + '.jpg'
             os.remove(file_path)
             length_video1 = length_video1 - mark1 +mark2 
     else:
         for index in range (0, mark2-mark1):
-            #name of the frames from secindary video
-            file_path = './frames_annotated/Daria_forhand_frame_' + str(i) + '.jpg'
+            #name of the frames from secondary video
+            file_path = './secondary_frames_annotated/jonas_serve_frame_' + str(i) + '.jpg'
             os.remove(file_path)
         #cut frames from video 2 at start amount of frames needed to be cut: mark2-mak1
 
@@ -715,13 +718,13 @@ def main():
     if length_video1 > length_video2:
         for i in range (length_video2, length_video1):
             #name of the frames from primary video
-            file_path = './frames_annotated/Daria_forhand_frame_' + str(i) + '.jpg'
+            file_path = './primary_frames_annotated/nadal_serve_frame_' + str(i) + '.jpg'
             os.remove(file_path)
     else:
         #cut frames video2 at end with number higher length_video1
         for i in range (length_video1, length_video2):
             #name of the frames from secondary video
-            file_path = './frames_annotated/Daria_forhand_frame_' + str(i) + '.jpg'
+            file_path = './secondary_frames_annotated/jonas_serve_frame_' + str(i) + '.jpg'
             os.remove(file_path)
 
 
@@ -783,5 +786,8 @@ def main():
 
 
 
+# Check if this script is being run directly (not imported as a module)
+if __name__ == "__main__":
+    main()  # Call the main function
 
 
