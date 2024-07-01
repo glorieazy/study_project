@@ -127,7 +127,10 @@ def main():
 
     landmark_positioning_right_ankle_1 = np.zeros((2,length_frames_folder),dtype = float)
     landmark_positioning_right_ankle_2 = np.zeros((2,length_frames_folder/2),dtype = float)
-
+    mark1=0 
+    highest_hand1=0
+    mark2=0
+    highest_hand2=0
     # Go through frames of one video and put landmark positions in an array
     for index in range(0,length_frames_folder/2):
 
@@ -276,7 +279,9 @@ def main():
                     dx = right_wrist_landmark_1.x - right_wrist_landmark_2.x
                     dy = right_wrist_landmark_1.y - right_wrist_landmark_2.y  
                     counter = 0
-                    
+                    if right_wrist_landmark_1.x > highest_hand1 :
+                        highest_hand1 = right_wrist_landmark_1
+                        mark1 = index
                     # Check if landmarks move unrealisticly much
                     while dx > 0.05 | dx < -0.05 | dy > 0.05 | dy < -0.05 :
                         counter = counter + 1
@@ -401,6 +406,8 @@ def main():
                     print('No right ankle detected')                                        
 
                     
+    #time synchronizing (code here isnt working yet, neeeds support for secondary video in detecting bad frames)
+
 
 
 
@@ -558,7 +565,9 @@ def main():
                     dx = right_wrist_landmark_1.x - right_wrist_landmark_2.x
                     dy = right_wrist_landmark_1.y - right_wrist_landmark_2.y  
                     counter = 0
-                    
+                    if right_wrist_landmark_1.x > highest_hand2 :
+                        highest_hand2 = right_wrist_landmark_1
+                        mark2 = index
                     # Check if landmarks move unrealisticly much
                     while dx > 0.05 | dx < -0.05 | dy > 0.05 | dy < -0.05 :
                         counter = counter + 1
@@ -704,7 +713,38 @@ def main():
             x_error = landmark1.x - landmark2.x - x_offset
             y_error = landmark1.y - landmark2.y - y_offset
             landmark_error[j] = norm([x_error, y_error]) ** 2
-            
+
+
+    #cutting frames at the front so that the moment for synchronizing is at the same frame number (cutting frames isnt working yet)
+    if mark1 > mark2:
+        for i in range (0, mark1-mark2):
+            #name of the frames from primary video
+            file_path = './frames_annotated/Daria_forhand_frame_' + str(i) + '.jpg'
+            os.remove(file_path)
+            length_video1 = length_video1 - mark1 +mark2 
+    else:
+        for index in range (0, mark2-mark1):
+            #name of the frames from secindary video
+            file_path = './frames_annotated/Daria_forhand_frame_' + str(i) + '.jpg'
+            os.remove(file_path)
+        #cut frames from video 2 at start amount of frames needed to be cut: mark2-mak1
+
+        #updating video length
+        length_video2 = length_video2 - mark2 + mark1
+
+
+    #cutting frames at the end so that both video have same length
+    if length_video1 > length_video2:
+        for i in range (length_video2, length_video1):
+            #name of the frames from primary video
+            file_path = './frames_annotated/Daria_forhand_frame_' + str(i) + '.jpg'
+            os.remove(file_path)
+    else:
+        #cut frames video2 at end with number higher length_video1
+        for i in range (length_video1, length_video2):
+            #name of the frames from secondary video
+            file_path = './frames_annotated/Daria_forhand_frame_' + str(i) + '.jpg'
+            os.remove(file_path)
 
 
 
