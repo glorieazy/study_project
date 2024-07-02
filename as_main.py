@@ -18,9 +18,9 @@ def main():
     config_json = asConfig("config/config.json")
     manager = asVideosManager( asConfig("config/config.json") )
     manager.primary = asVideo( dir=manager.config.get_value("dirs","media"),  
-                                name="Daria_forhand.mp4") 
+                                name="a_Federer_forehand.mp4") 
     manager.secondary = asVideo( dir=manager.config.get_value("dirs","media"),  
-                                  name="Teana_forhand.mp4") 
+                                  name="Andriy_forehand.mp4") 
     
     
     ########################
@@ -111,7 +111,7 @@ def main():
     for path in os.listdir(dir_path):
         # check if current path is a file
         if os.path.isfile(os.path.join(dir_path, path)):
-            if 'Daria' in path:
+            if 'Federer' in path:
                 number += 1
 
     length_video1 = number
@@ -700,17 +700,17 @@ def main():
     if mark1 > mark2:
         for i in range (0, mark1-mark2):
             #name of the frames from primary video
-            file_path = './primary_frames_annotated/Daria_forhand_frame_' + str(i) + '.jpg'
+            file_path = './primary_frames_annotated/a_Federer_forehand_frame_' + str(i) + '.jpg'
             os.remove(file_path)
-            file_path = './frames/Daria_forhand_frame_' + str(i) + '.jpg'
+            file_path = './frames/a_Federer_forehand_frame_' + str(i) + '.jpg'
             os.remove(file_path)
             length_video1 = length_video1 - mark1 + mark2 
     else:
         for index in range (0, mark2-mark1):
             #name of the frames from secondary video
-            file_path = './secondary_frames_annotated/Teana_forhand_frame_' + str(index) + '.jpg'
+            file_path = './secondary_frames_annotated/Andriy_forehand_frame_' + str(index) + '.jpg'
             os.remove(file_path)
-            file_path = './frames/Teana_forhand_frame_' + str(index) + '.jpg'
+            file_path = './frames/Andriy_forehand_frame_' + str(index) + '.jpg'
             os.remove(file_path)
         #cut frames from video 2 at start amount of frames needed to be cut: mark2-mak1
 
@@ -722,18 +722,18 @@ def main():
     if length_video1 > length_video2:
         for i in range (length_video2, length_video1):
             #name of the frames from primary video
-            file_path = './primary_frames_annotated/Daria_forhand_frame_' + str(i) + '.jpg'
+            file_path = './primary_frames_annotated/a_Federer_forehand_frame_' + str(i) + '.jpg'
             os.remove(file_path)
-            file_path = './frames/Daria_forhand_frame_' + str(i) + '.jpg'
+            file_path = './frames/a_Federer_forehand_frame_' + str(i) + '.jpg'
             os.remove(file_path)
     else:
         #cut frames video2 at end with number higher length_video1
         for index in range (length_video1, length_video2):
             #name of the frames from secondary video
             
-            file_path = './secondary_frames_annotated/Teana_forhand_frame_' + str(index) + '.jpg'
+            file_path = './secondary_frames_annotated/Andriy_forehand_frame_' + str(index) + '.jpg'
             os.remove(file_path)
-            file_path = './frames/Teana_forhand_frame_' + str(index) + '.jpg'
+            file_path = './frames/Andriy_forehand_frame_' + str(index) + '.jpg'
             os.remove(file_path)
 
 
@@ -1159,11 +1159,11 @@ def main():
                         min_detection_confidence=0.5)
 
     # Extract landmarks
-    landmark_image1 = cv2.imread('frames/Daria_forhand_frame_0.jpg')
-    landmark_image2 = cv2.imread('frames/Tanea_forhand_frame_0.jpg')
+    landmark_image1 = cv2.imread('frames/a_Federer_forehand_frame_0.jpg')
+    landmark_image2 = cv2.imread('frames/Andriy_forehand_frame_0.jpg')
 
     # Adjust image shape for comparison
-    landmark_image2 = cv2.resize(landmark_image2,(400, 720)) # Original shape: (848, 480, 3)
+    landmark_image2 = cv2.resize(landmark_image2,(1920, 1080)) # Original shape: (848, 480, 3)
 
     # Perform pose estimation on the first image and find the landmarks
     results1 = pose.process(cv2.cvtColor(landmark_image1, cv2.COLOR_BGR2RGB))
@@ -1208,7 +1208,7 @@ def main():
         image2 = cv2.cvtColor(image2,cv2.COLOR_BGR2BGRA)               # Add alpha channel
 
         # Resize image for aligning the body
-        image2 = cv2.resize(image2,(400, 720)) # Original shape: (848, 480, 3)
+        image2 = cv2.resize(image2,(1920, 1080)) # Original shape: (848, 480, 3)
             
         
         # Compute relevant region around both bodies for overlaying
