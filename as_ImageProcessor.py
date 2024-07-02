@@ -1,10 +1,19 @@
+
 class asImageProcessor():
     """
     This class contains image processor stuff:
     https://developers.google.com/mediapipe/solutions/vision/pose_landmarker/python
-    """    
+    """
     def __init__(self):
         self.detector = None
+        #self.detection_result = None
+        #self.NormalizedLandmarks = []
+        #self.Landmarks = []
+        #self.segmentation_mask = []
+
+        # status
+        #self.is_processed = False
+
 
     def get_detector(self):
         """

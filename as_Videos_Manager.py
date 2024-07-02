@@ -1,47 +1,37 @@
-###################################################
-### This class manageres all videos in this app ###
-###################################################
-
 class asVideosManager:
 
-    def __init__(self):
-        # attrs
-        self.config          = None
-        self.primary         = None
-        self.secondary       = None
-        self.secondaries     = None
-        self.logger          = None 
-        self.image_processor = None
-
-    def add_config( self, config ):
-        """
-        Add config to manager
-        """
+    def __init__(self, config):
         self.config = config
 
-    def add_primary( self, primary ):
-        """
-        Add primary video to manager
-        """
-        self.primary = primary
+        self._primary     = None
+        self._secondary   = None
+        self._secondaries = None
 
-    def add_secondary( self, secondary ):
-        """
-        Add secondary video to manager
-        """
-        self.secondary = secondary
+    @property
+    def primary(self):
+        return self._primary
 
-    def add_logger( self, logger ):
-        """
-        Add logger to manager
-        """
-        self.logger = logger
+    @primary.setter
+    def primary(self, value):
+        self._primary = value
 
-    def add_image_processor( self, image_processor ):
-        """
-        Add image_processor to manager
-        """
-        self.image_processor = image_processor
+    @property
+    def secondary(self):
+        return self._secondary
+
+    @secondary.setter
+    def secondary(self, value):
+        self._secondary = value
+
+    @property
+    def secondaries(self):
+        return self._secondaries
+
+    @secondaries.setter
+    def secondaries(self, videos):
+        self._secondaries = []
+        for item in videos:
+            self._secondaries.append(item)
 
     ###################################
     ### decompose video into frames ###
@@ -150,7 +140,6 @@ class asVideosManager:
                    manager.config.get_value("dump_data","file") +'.pkl', 'wb') as file:
             pickle.dump(manager, file)
 
-
     @staticmethod
     def load():
         """
@@ -168,64 +157,3 @@ class asVideosManager:
             manager = pickle.load(file)
 
         return manager
-    
-
-    ##############################################################
-    ### methods, which are still not included into the diagram ###
-    ##############################################################          
-    def set_video(self, type_of_video="primary"):
-        """
-        Read video from config
-        Input:
-           type_of_video - "primary", secondary, ...
-        """    
-        from as_Video import asVideo
-        dir = self.config.get_value("dirs","media") 
-        name = self.config.get_value("videos",type_of_video) 
-
-        # read video
-        if type_of_video == "primary":
-            self.primary = asVideo( dir=dir, name=name ) 
-        elif type_of_video == "secondary":               
-            self.secondary = asVideo( dir=dir, name=name )      
-        else: 
-            raise Exception("Incorrect type_of_video in <set_video>")            
-        
-
-    def init_param_video(self, type_of_video="primary"):
-        """
-        Initiliase parameters of video
-        Set parameters        
-        Input:
-           type_of_video - "primary", secondary, ...
-        """    
-  
-        # init params of video
-        if type_of_video == "primary":
-            self.primary.init_video()
-            # self.primary.display_info(is_detailed=True)
-        elif type_of_video == "secondary":               
-            self.secondary.init_video()
-            # self.secondary.display_info(is_detailed=True)
-        else: 
-            raise Exception("Incorrect type_of_video in <init_param_video>")            
-    
-    
-    ##############################################################
-    ### methods, which are still not included into the diagram ###
-    ##############################################################          
-    def decompose_video_into_frames(self, type_of_video="primary"):
-        """
-        Decompose primary and secondary videos into frames
-        """
-        # init params of video
-        if type_of_video == "primary":
-            self.decompose_into_frames( video=self.primary, append_frames=True )        
-        elif type_of_video == "secondary":               
-            self.decompose_into_frames( video=self.secondary, append_frames=True )        
-        else: 
-            raise Exception("Incorrect type_of_video in <decompose_video_into_frames>")            
-
-
-
-                

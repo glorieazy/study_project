@@ -1,5 +1,6 @@
 from as_ImageProcessor import asImageProcessor
 
+
 class asFrame():
     """
     This class contains information about captured frame

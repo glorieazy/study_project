@@ -1,15 +1,9 @@
 
-##################################
-### One-video containing class ###
-##################################
-
 from typing import List
 from as_Frame import asFrame
 
 class asVideo:
-    """
-    This class contains information about one video
-    """
+
     def __init__(self, dir=None, name=None):
         """
         dummy constructor
@@ -211,7 +205,7 @@ class asVideo:
             print(f"dir: {self._dir}")
 
 
-    def create_annotated_from_frames(self, image_processor, dir_to_save):
+    def process_annotated_frames(self, image_processor, dir_to_save):
         """
         processes all frames, create annotated and save them into path_to_save       
         """
@@ -272,15 +266,16 @@ class asVideo:
         cv2.destroyAllWindows()        
         video.release()
 
-    # def create_video_segmentation_mask(self, dir_to_read_from, dir_write_to, to_show_frames=False):
-    #     """
-    #     create annotated video from frames in dir_to_read_from        
-    #     """
-    #     FINISHED HERE 
-    #     TAKE A LOOK AT get_segmentation_mask in asFrame 
-    #     and at
-    #     create_video_annotated above  
-    #     to create the correpoding movie 
+    def create_video_segmentation_mask(self, dir_to_read_from, dir_write_to, to_show_frames=False):
+        """
+        create annotated video from frames in dir_to_read_from        
+        """
+        pass
+        # FINISHED HERE 
+        # TAKE A LOOK AT get_segmentation_mask in asFrame 
+        # and at
+        # create_video_annotated above  
+        # to create the correpoding movie 
 
 
     def create_video_with_landmarks(self):

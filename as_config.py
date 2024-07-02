@@ -1,15 +1,8 @@
-##########################
-### Configuration file ###
-##########################
-
 import json
 import pprint
 
 class asConfig:
-    """
-    Class containing configuration information
-    and estabilishes connection with config file
-    """
+    
     def __init__(self, filename=None):
         """
         read json from file
