@@ -1,2 +1,5 @@
 mediapipe
 moviepy
+pandas
+torch
+numpy
