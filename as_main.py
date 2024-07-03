@@ -1029,7 +1029,7 @@ def main():
     folder_images = sorted(folder_images)
 
     # Get relevant frames from secondary video
-    folder_images = folder_images[int(length_frames_folder/2):int(length_frames_folder)]
+    folder_images = folder_images[0:int(length_frames_folder/2)]
     folder_images = sorted(folder_images, key=extract_number)
     
     # Iterate over images from folder
@@ -1112,7 +1112,7 @@ def main():
     # Get relevant frames from secondary video
     #start_index = 65
     #frames_folder = frames_folder[start_index:]
-    frames_folder = frames_folder[0:int(length_frames_folder)]
+    frames_folder = frames_folder[0:int(length_frames_folder/2)]
     frames_folder = sorted(frames_folder, key=extract_number)
     
     # Iterate over images pairwise from both folders
@@ -1210,7 +1210,7 @@ def main():
         # Resize image for aligning the body
         image2 = cv2.resize(image2,(1920, 1080)) # Original shape: (848, 480, 3)
             
-        
+        '''
         # Compute relevant region around both bodies for overlaying
 
         nose_y_1 = int(nose_landmark_1.y * image1.shape[0])        # reference point for the top edge of the first region
@@ -1239,11 +1239,11 @@ def main():
         top_y_2 = nose_y_2 - 120
         
         diff_x = left_x_1-right_x_1 - (left_x_2-right_x_2) 
-        diff_y = bottom_y_1 - top_y_1 - (bottom_y_2-top_y_2)
+        diff_y = bottom_y_1 - top_y_1 - (bottom_y_2-top_y_2)'''
         
         alpha = 0.5  # Factor for transparency
 
-        # Distribute the differences in width and height of both regions evenly
+        '''# Distribute the differences in width and height of both regions evenly
 
         if diff_x < 0:
             diff_x = - diff_x
@@ -1276,8 +1276,9 @@ def main():
             image1[top_y_1+int(diff_y/4):bottom_y_1-int(diff_y/4), right_x_1+int(diff_x/4):left_x_1-int(diff_x/4), :] = np.uint8(
                 image1[top_y_1+int(diff_y/4):bottom_y_1-int(diff_y/4), right_x_1+int(diff_x/4):left_x_1-int(diff_x/4), :] * alpha +  
                 image2[top_y_2-int(diff_y/4):bottom_y_2+int(diff_y/4), right_x_2-int(diff_x/4):left_x_2+int(diff_x/4), :]   * (1-alpha)
-            )     
+            )    '''
         
+        image1 = image1 * alpha + image2 * (1-alpha)
 
         # Generate a unique filename for the combined image
         combined_image_filename = f'combined_image_{idx}.jpg'  
