@@ -11,16 +11,72 @@ from as_config import asConfig
 
 def main():
 
+    import os
+    import cv2
+    import numpy as np
+    from numpy.linalg import norm
+    import mediapipe as mp
+    from mediapipe import solutions
+    from mediapipe.framework.formats import landmark_pb2
+
+    #########################
+    ### remove old frames ###
+    #########################
+
+    folder = 'frames'
+    for file_name in os.listdir(folder):
+        file_path = './frames/' + file_name
+        os.remove(file_path)
+
+    folder = 'error_landmarks'
+    for file_name in os.listdir(folder):
+        file_path = './error_landmarks/' + file_name
+        os.remove(file_path)
+
+    folder = 'frames_annotated'
+    for file_name in os.listdir(folder):
+        file_path = './frames_annotated/' + file_name
+        os.remove(file_path)
+
+    folder = 'frames_landmarks'
+    for file_name in os.listdir(folder):
+        file_path = './frames_landmarks/' + file_name
+        os.remove(file_path)
+
+    folder = 'primary_frames_annotated'
+    for file_name in os.listdir(folder):
+        file_path = './primary_frames_annotated/' + file_name
+        os.remove(file_path)
+
+    folder = 'secondary_frames_annotated'
+    for file_name in os.listdir(folder):
+        file_path = './secondary_frames_annotated/' + file_name
+        os.remove(file_path)
+
+    folder = 'segmented_frames'
+    for file_name in os.listdir(folder):
+        file_path = './segmented_frames/' + file_name
+        os.remove(file_path)
+
+    folder = 'segmented_frames_annotated'
+    for file_name in os.listdir(folder):
+        file_path = './segmented_frames_annotated/' + file_name
+        os.remove(file_path)
     
     # ######################
     # ### starts manager ###
     # ######################
+
+    #insert name of the two videos up for comparison without suffix
+    video1 = 'Andi_forehand'
+    video2 = 'Andriy_forehand'
+
     config_json = asConfig("config/config.json")
     manager = asVideosManager( asConfig("config/config.json") )
     manager.primary = asVideo( dir=manager.config.get_value("dirs","media"),  
-                                name="a_Federer_forehand.mp4") 
+                                name=video1+'.mp4') 
     manager.secondary = asVideo( dir=manager.config.get_value("dirs","media"),  
-                                  name="Andriy_forehand.mp4") 
+                                  name=video2+'.mp4') 
     
     
     ########################
@@ -80,13 +136,7 @@ def main():
 
     #find frames with bad landmarks
 
-    import os
-    import cv2
-    import numpy as np
-    from numpy.linalg import norm
-    import mediapipe as mp
-    from mediapipe import solutions
-    from mediapipe.framework.formats import landmark_pb2  
+  
 
     mp_pose = mp.solutions.pose
 
@@ -111,7 +161,7 @@ def main():
     for path in os.listdir(dir_path):
         # check if current path is a file
         if os.path.isfile(os.path.join(dir_path, path)):
-            if 'Federer' in path:
+            if video1 in path:
                 number += 1
 
     length_video1 = number
@@ -131,7 +181,7 @@ def main():
 
     landmark_positioning_right_ankle_1 = np.zeros((2,length_frames_folder),dtype = float)
     #landmark_positioning_right_ankle_2 = np.zeros((2,length_frames_folder/2),dtype = float)
-    mark1=0 
+    mark1=0
     highest_hand1=0
     mark2=0
     highest_hand2=0
@@ -700,40 +750,44 @@ def main():
     if mark1 > mark2:
         for i in range (0, mark1-mark2):
             #name of the frames from primary video
-            file_path = './primary_frames_annotated/a_Federer_forehand_frame_' + str(i) + '.jpg'
+            file_path = './primary_frames_annotated/'+video1+'_frame_' + str(i) + '.jpg'
             os.remove(file_path)
-            file_path = './frames/a_Federer_forehand_frame_' + str(i) + '.jpg'
+            file_path = './frames/'+video1+'_frame_' + str(i) + '.jpg'
             os.remove(file_path)
-            length_video1 = length_video1 - mark1 + mark2 
+        length_video1 = length_video1 - mark1 + mark2 
     else:
         for index in range (0, mark2-mark1):
             #name of the frames from secondary video
-            file_path = './secondary_frames_annotated/Andriy_forehand_frame_' + str(index) + '.jpg'
+            file_path = './secondary_frames_annotated/'+video2+'_frame_' + str(index) + '.jpg'
             os.remove(file_path)
-            file_path = './frames/Andriy_forehand_frame_' + str(index) + '.jpg'
+            file_path = './frames/'+video2+'_frame_' + str(index) + '.jpg'
             os.remove(file_path)
         #cut frames from video 2 at start amount of frames needed to be cut: mark2-mak1
 
         #updating video length
         length_video2 = length_video2 - mark2 + mark1
 
+    print(mark1)
+    print(mark2)
+    print(length_video1)
+    print(length_video2)
 
     #cutting frames at the end so that both video have same length
     if length_video1 > length_video2:
         for i in range (length_video2, length_video1):
             #name of the frames from primary video
-            file_path = './primary_frames_annotated/a_Federer_forehand_frame_' + str(i) + '.jpg'
+            file_path = './primary_frames_annotated/'+video1+'_frame_' + str(i+abs(mark1-mark2)) + '.jpg'
             os.remove(file_path)
-            file_path = './frames/a_Federer_forehand_frame_' + str(i) + '.jpg'
+            file_path = './frames/'+video1+'_frame_' + str(i+abs(mark1-mark2)) + '.jpg'
             os.remove(file_path)
     else:
         #cut frames video2 at end with number higher length_video1
         for index in range (length_video1, length_video2):
             #name of the frames from secondary video
             
-            file_path = './secondary_frames_annotated/Andriy_forehand_frame_' + str(index) + '.jpg'
+            file_path = './secondary_frames_annotated/'+video2+'_frame_' + str(index+abs(mark1-mark2)) + '.jpg'
             os.remove(file_path)
-            file_path = './frames/Andriy_forehand_frame_' + str(index) + '.jpg'
+            file_path = './frames/'+video2+'_frame_' + str(index+abs(mark1-mark2)) + '.jpg'
             os.remove(file_path)
 
 
@@ -808,7 +862,7 @@ def main():
 
 
 
-
+    
     # Save errors in csv file
     import pandas as pd 
     
@@ -995,7 +1049,7 @@ def main():
 
 
 
-    '''delete from here?'''
+    
 
 
 
@@ -1029,7 +1083,7 @@ def main():
     folder_images = sorted(folder_images)
 
     # Get relevant frames from secondary video
-    folder_images = folder_images[0:int(length_frames_folder/2)]
+    folder_images = folder_images[int(length_frames_folder/2):int(length_frames_folder)]
     folder_images = sorted(folder_images, key=extract_number)
     
     # Iterate over images from folder
@@ -1112,7 +1166,7 @@ def main():
     # Get relevant frames from secondary video
     #start_index = 65
     #frames_folder = frames_folder[start_index:]
-    frames_folder = frames_folder[0:int(length_frames_folder/2)]
+    frames_folder = frames_folder[int(length_frames_folder/2):int(length_frames_folder)]
     frames_folder = sorted(frames_folder, key=extract_number)
     
     # Iterate over images pairwise from both folders
@@ -1157,13 +1211,26 @@ def main():
                         model_complexity=2, 
                         enable_segmentation=True,
                         min_detection_confidence=0.5)
+    
+    '''frames_folder_path = 'frames'
+
+    
+    frames_folder = [filename for filename in os.listdir(frames_folder_path) if filename.endswith(('.jpg', '.png', '.jpeg'))]
+    
+
+    primary_first_frame = frames_folder[0]
+    secondary_first_frame = frames_folder[int(length_frames_folder/2)]
 
     # Extract landmarks
-    landmark_image1 = cv2.imread('frames/a_Federer_forehand_frame_0.jpg')
-    landmark_image2 = cv2.imread('frames/Andriy_forehand_frame_0.jpg')
+    landmark_image1 = cv2.imread(str(primary_first_frame))
+    landmark_image2 = cv2.imread(str(secondary_first_frame))'''
+
+        # Extract landmarks
+    landmark_image1 = cv2.imread('frames/'+video1+'_frame_0.jpg')
+    landmark_image2 = cv2.imread('frames/'+video2+'_frame_0.jpg')
 
     # Adjust image shape for comparison
-    landmark_image2 = cv2.resize(landmark_image2,(1920, 1080)) # Original shape: (848, 480, 3)
+    #landmark_image2 = cv2.resize(landmark_image2,(1920, 1080)) # Original shape: (848, 478, 3)
 
     # Perform pose estimation on the first image and find the landmarks
     results1 = pose.process(cv2.cvtColor(landmark_image1, cv2.COLOR_BGR2RGB))
@@ -1208,10 +1275,10 @@ def main():
         image2 = cv2.cvtColor(image2,cv2.COLOR_BGR2BGRA)               # Add alpha channel
 
         # Resize image for aligning the body
-        image2 = cv2.resize(image2,(1920, 1080)) # Original shape: (848, 480, 3)
+        #image2 = cv2.resize(image2,(1920, 1080)) # Original shape: (848, 478, 3)
             
-        '''
-        # Compute relevant region around both bodies for overlaying
+        
+        '''# Compute relevant region around both bodies for overlaying
 
         nose_y_1 = int(nose_landmark_1.y * image1.shape[0])        # reference point for the top edge of the first region
         nose_y_2 = int(nose_landmark_2.y * image2.shape[0])        # reference point for the top edge of the second region
@@ -1231,12 +1298,12 @@ def main():
         right_x_1 = r_heel_x_1 - 120                         
         left_x_1 = l_heel_x_1 + 50
         bottom_y_1 = max(r_heel_y_1 + 30 ,l_heel_y_1 + 30)
-        top_y_1 = nose_y_1 - 120
+        top_y_1 = nose_y_1 - 136
 
         right_x_2 = r_heel_x_2 - 120
-        left_x_2 = l_heel_x_2 + 35
+        left_x_2 = l_heel_x_2 + 50
         bottom_y_2 = max(r_heel_y_2 + 30 ,l_heel_y_2 + 30)
-        top_y_2 = nose_y_2 - 120
+        top_y_2 = nose_y_2 - 144
         
         diff_x = left_x_1-right_x_1 - (left_x_2-right_x_2) 
         diff_y = bottom_y_1 - top_y_1 - (bottom_y_2-top_y_2)'''
