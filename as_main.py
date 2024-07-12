@@ -182,9 +182,9 @@ def main():
     landmark_positioning_right_ankle_1 = np.zeros((2,length_frames_folder),dtype = float)
     #landmark_positioning_right_ankle_2 = np.zeros((2,length_frames_folder/2),dtype = float)
     mark1=0
-    highest_hand1=0
+    highest_hand1=1
     mark2=0
-    highest_hand2=0
+    highest_hand2=1
     # Go through frames of one video and put landmark positions in an array
     for index in range(0,number):
 
@@ -460,7 +460,6 @@ def main():
                     print('No right ankle detected')                                        
 
                     
-    #time synchronizing (code here isnt working yet, neeeds support for secondary video in detecting bad frames)
 
 
 
@@ -749,23 +748,33 @@ def main():
     #cutting frames at the front so that the moment for synchronizing is at the same frame number (cutting frames isnt working yet)
     if mark1 > mark2:
         for i in range (0, mark1-mark2):
+            #cutting frames from the front of video 1
             #name of the frames from primary video
             file_path = './primary_frames_annotated/'+video1+'_frame_' + str(i) + '.jpg'
             os.remove(file_path)
             file_path = './frames/'+video1+'_frame_' + str(i) + '.jpg'
             os.remove(file_path)
+
+        #saving that video 1 got cut at the front for later renaming
+        cut_video1 = True
         length_video1 = length_video1 - mark1 + mark2 
     else:
         for index in range (0, mark2-mark1):
+            #cut frames from video 2 at start amount of frames needed to be cut: mark2-mak1
             #name of the frames from secondary video
             file_path = './secondary_frames_annotated/'+video2+'_frame_' + str(index) + '.jpg'
             os.remove(file_path)
             file_path = './frames/'+video2+'_frame_' + str(index) + '.jpg'
             os.remove(file_path)
-        #cut frames from video 2 at start amount of frames needed to be cut: mark2-mak1
+        
 
         #updating video length
         length_video2 = length_video2 - mark2 + mark1
+        #saving that video 2 got cut for later renaming
+        cut_video1 = False
+
+
+
 
     print(mark1)
     print(mark2)
@@ -801,19 +810,45 @@ def main():
     #frames_folder_2 = [filename for filename in os.listdir(frames_folder_path_2) if filename.endswith(('.jpg', '.png', '.jpeg'))]
     frames_folder = [filename for filename in os.listdir(frames_folder_path) if filename.endswith(('.jpg', '.png', '.jpeg'))]
 
-    
+
+    frames_folder = sorted(frames_folder)
+
+    length_frames_folder = len(frames_folder)
+
+
+    #renaming frames so its back to start at zero
+    if cut_video1:
+         #renaming frames of video 1 so it starts at frame 0
+         print ('renaming Andi')
+         for i in range (0 , int(length_frames_folder/2)):
+              os.rename('./primary_frames_annotated/'+video1+'_frame_' + str(i+abs(mark1-mark2)) + '.jpg' ,'./primary_frames_annotated/'+video1+'_frame_' + str(i) + '.jpg')
+              os.rename('./frames/'+video1+'_frame_' + str(i+abs(mark1-mark2)) + '.jpg' ,'./frames/'+video1+'_frame_' + str(i) + '.jpg')
+
+    else:
+         #renaming frames of video 2 so it starts at frame 0
+         print ('renaming Andriy')
+         for i in range (0, int(length_frames_folder/2)):
+              os.rename('./secondary_frames_annotated/'+video2+'_frame_' + str(i+abs(mark1-mark2)) + '.jpg', './secondary_frames_annotated/'+video2+'_frame_' + str(i) + '.jpg')
+              os.rename('./frames/'+video2+'_frame_' + str(i+abs(mark1-mark2)) + '.jpg', './frames/'+video2+'_frame_' + str(i) + '.jpg')
     
     # Sort the frames after the numbers
     #primary_frames_folder = sorted(frames_folder_1)
     #secondary_frames_folder = sorted(frames_folder_2)
+        
     frames_folder = sorted(frames_folder)
-
-    length_frames_folder = len(frames_folder)        
-
     
 
     landmark_error = np.zeros(int(length_frames_folder/2),dtype=float)
 
+   
+    start1 = 0
+    start2 = int(length_frames_folder/2)
+        
+    
+    end1 = start2
+    end2 = length_frames_folder
+    
+    '''
     if mark1 > mark2:
         start1 = mark1-mark2
     else:
@@ -826,7 +861,7 @@ def main():
     else:
         end1 = length_video1 + start1
         end2 = length_video1 + length_video1 + abs(mark1-mark2)
-
+    '''
 
     for j in range(0,int(length_frames_folder/2)):
         x_offset = landmark_positioning_nose_1[0,start1+j] - landmark_positioning_nose_1[0,start2+j]
@@ -838,14 +873,19 @@ def main():
             model_complexity=2,
             enable_segmentation=True,
             min_detection_confidence=0.5) as pose:
-
-                primary_frame = frames_folder[j]
-                primary_frames_path = os.path.join(frames_folder_path, primary_frame) 
+                
+                
+                #primary_frame = frames_folder[j]
+                #primary_frames_path = os.path.join(frames_folder_path, primary_frame) 
+                primary_frames_path ='frames\\'  + video1+ '_frame_' + str(j) + '.jpg'
                 primary_image = cv2.imread(primary_frames_path)
                 results_1 = pose.process(cv2.cvtColor(primary_image, cv2.COLOR_BGR2RGB))
-
-                secondary_frame = frames_folder[int(length_frames_folder/2)+j]
-                secondary_frames_path = os.path.join(frames_folder_path,secondary_frame)
+                
+                #secondary_frame = frames_folder[int(length_frames_folder/2)+j]
+                #secondary_frames_path = os.path.join(frames_folder_path,secondary_frame)
+                secondary_frames_path ='frames\\'+video2+'_frame_' + str(j) + '.jpg'
+                
+                
                 secondary_image = cv2.imread(secondary_frames_path)
                 results_2 = pose.process(cv2.cvtColor(secondary_image, cv2.COLOR_BGR2RGB))
 
@@ -1440,5 +1480,4 @@ def main():
 # Check if this script is being run directly (not imported as a module)
 if __name__ == "__main__":
     main()  # Call the main function
-
 
