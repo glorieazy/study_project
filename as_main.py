@@ -181,10 +181,30 @@ def main():
 
     landmark_positioning_right_ankle_1 = np.zeros((2,length_frames_folder),dtype = float)
     #landmark_positioning_right_ankle_2 = np.zeros((2,length_frames_folder/2),dtype = float)
+
+    #checking if video is serve or not
+    if 'serve' in video1:
+         if 'serve' in video2:
+              serve = True
+         else:
+              print('Please compare same type of video')
+    else:
+         if 'serve' in video2:
+              print('Please compare same type of video')
+         else:
+              serve = False
+
+    #Setting initial Values to find point for synchronizing
+    if serve:
+         highest_hand1 = 0
+         highest_hand2 = 0
+    else:
+         highest_hand1=1
+         highest_hand2=1
+
     mark1=0
-    highest_hand1=1
     mark2=0
-    highest_hand2=1
+    
     # Go through frames of one video and put landmark positions in an array
     for index in range(0,number):
 
@@ -333,9 +353,14 @@ def main():
                     dx = right_wrist_landmark_1.x - right_wrist_landmark_2.x
                     dy = right_wrist_landmark_1.y - right_wrist_landmark_2.y  
                     counter = 0
-                    if right_wrist_landmark_1.x < highest_hand1 :
-                        highest_hand1 = right_wrist_landmark_1.x
-                        mark1 = index
+                    if serve:
+                        if right_wrist_landmark_1.y > highest_hand1 :
+                            highest_hand1 = right_wrist_landmark_1.x
+                            mark1 = index
+                    else:
+                        if right_wrist_landmark_1.x < highest_hand1 :
+                            highest_hand1 = right_wrist_landmark_1.x
+                            mark1 = index
                     # Check if landmarks move unrealisticly much
                     while dx > 0.05 or dx < -0.05 or dy > 0.05 or dy < -0.05 :
                         counter = counter + 1
@@ -1314,8 +1339,12 @@ def main():
         image2 = cv2.imread(segmented_path, cv2.IMREAD_UNCHANGED)
         image2 = cv2.cvtColor(image2,cv2.COLOR_BGR2BGRA)               # Add alpha channel
 
+
+        wid = image1.shape[1]
+        hgt = image1.shape[0]
+
         # Resize image for aligning the body
-        #image2 = cv2.resize(image2,(1920, 1080)) # Original shape: (848, 478, 3)
+        image2 = cv2.resize(image2,(wid, hgt)) # Original shape: (848, 478, 3)
             
         
         '''# Compute relevant region around both bodies for overlaying
