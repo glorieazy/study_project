@@ -834,7 +834,7 @@ def main():
             #deleting corresponding landmark info
 
             
-            landmark_positioning_nose_1 = np.delete(landmark_positioning_nose_1,i,1)
+            landmark_positioning_nose_1 = np.delete(landmark_positioning_nose_1,length_video2,1)
             landmark_positioning_left_wrist_1 = np.delete(landmark_positioning_left_wrist_1,length_video2,1)
             landmark_positioning_right_wrist_1 = np.delete(landmark_positioning_right_wrist_1,length_video2,1)
             landmark_positioning_left_ankle_1 = np.delete(landmark_positioning_left_ankle_1,length_video2,1)
