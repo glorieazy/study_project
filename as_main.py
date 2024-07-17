@@ -769,8 +769,8 @@ def main():
                 else:
                     print('No right ankle detected')                                        
 
-
-    #cutting frames at the front so that the moment for synchronizing is at the same frame number (cutting frames isnt working yet)
+    print(landmark_positioning_nose_1)
+    #cutting frames at the front so that the moment for synchronizing is at the same frame number
     if mark1 > mark2:
         for i in range (0, mark1-mark2):
             #cutting frames from the front of video 1
@@ -779,6 +779,14 @@ def main():
             os.remove(file_path)
             file_path = './frames/'+video1+'_frame_' + str(i) + '.jpg'
             os.remove(file_path)
+            #deleting corresponding landmark info
+            landmark_positioning_nose_1 = np.delete(landmark_positioning_nose_1,0,1)
+            landmark_positioning_left_wrist_1 = np.delete(landmark_positioning_left_wrist_1,0,1)
+            landmark_positioning_right_wrist_1 = np.delete(landmark_positioning_right_wrist_1,0,1)
+            landmark_positioning_left_ankle_1 = np.delete(landmark_positioning_left_ankle_1,0,1)
+            landmark_positioning_right_ankle_1 = np.delete(landmark_positioning_right_ankle_1,0,1)
+        
+ 
 
         #saving that video 1 got cut at the front for later renaming
         cut_video1 = True
@@ -791,7 +799,15 @@ def main():
             os.remove(file_path)
             file_path = './frames/'+video2+'_frame_' + str(index) + '.jpg'
             os.remove(file_path)
-        
+            #deleting corresponding landmark info
+            landmark_positioning_nose_1 = np.delete(landmark_positioning_nose_1,length_video1,1)
+            landmark_positioning_left_wrist_1 = np.delete(landmark_positioning_left_wrist_1,length_video1,1)
+            landmark_positioning_right_wrist_1 = np.delete(landmark_positioning_right_wrist_1,length_video1,1)
+            landmark_positioning_left_ankle_1 = np.delete(landmark_positioning_left_ankle_1,length_video1,1)
+            landmark_positioning_right_ankle_1 = np.delete(landmark_positioning_right_ankle_1,length_video1,1)
+
+
+
 
         #updating video length
         length_video2 = length_video2 - mark2 + mark1
@@ -814,6 +830,17 @@ def main():
             os.remove(file_path)
             file_path = './frames/'+video1+'_frame_' + str(i+abs(mark1-mark2)) + '.jpg'
             os.remove(file_path)
+
+            #deleting corresponding landmark info
+
+            
+            landmark_positioning_nose_1 = np.delete(landmark_positioning_nose_1,i,1)
+            landmark_positioning_left_wrist_1 = np.delete(landmark_positioning_left_wrist_1,length_video2,1)
+            landmark_positioning_right_wrist_1 = np.delete(landmark_positioning_right_wrist_1,length_video2,1)
+            landmark_positioning_left_ankle_1 = np.delete(landmark_positioning_left_ankle_1,length_video2,1)
+            landmark_positioning_right_ankle_1 = np.delete(landmark_positioning_right_ankle_1,length_video2,1)
+
+
     else:
         #cut frames video2 at end with number higher length_video1
         for index in range (length_video1, length_video2):
@@ -823,8 +850,16 @@ def main():
             os.remove(file_path)
             file_path = './frames/'+video2+'_frame_' + str(index+abs(mark1-mark2)) + '.jpg'
             os.remove(file_path)
+            print(index)
+            #deleting corresponding landmark info
+            landmark_positioning_nose_1 = np.delete(landmark_positioning_nose_1,int(length_video1*2),1)
+            landmark_positioning_left_wrist_1 = np.delete(landmark_positioning_left_wrist_1,int(length_video1*2),1)
+            landmark_positioning_right_wrist_1 = np.delete(landmark_positioning_right_wrist_1,int(length_video1*2),1)
+            landmark_positioning_left_ankle_1 = np.delete(landmark_positioning_left_ankle_1,int(length_video1*2),1)
+            landmark_positioning_right_ankle_1 = np.delete(landmark_positioning_right_ankle_1,int(length_video1*2),1)
 
 
+    print(landmark_positioning_nose_1)
     # Folders containing relevant images
     #frames_folder_path_1 = 'primary_frames_annotated'
     #frames_folder_path_2 = 'secondary_frames_annotated'
@@ -1509,4 +1544,3 @@ def main():
 # Check if this script is being run directly (not imported as a module)
 if __name__ == "__main__":
     main()  # Call the main function
-
