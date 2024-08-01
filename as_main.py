@@ -62,6 +62,16 @@ def main():
     for file_name in os.listdir(folder):
         file_path = './segmented_frames_annotated/' + file_name
         os.remove(file_path)
+
+    folder = 'frames_annotated_interpolation'
+    for file_name in os.listdir(folder):
+        file_path = './frames_annotated_interpolation/' + file_name
+        os.remove(file_path)
+
+    folder = 'segmented_frames_annotated_interpolation'
+    for file_name in os.listdir(folder):
+        file_path = './segmented_frames_annotated_interpolation/' + file_name
+        os.remove(file_path)
     
     # ######################
     # ### starts manager ###
@@ -816,12 +826,12 @@ def main():
 
 
 
-
+    '''
     print(mark1)
     print(mark2)
     print(length_video1)
     print(length_video2)
-
+    '''
     #cutting frames at the end so that both video have same length
     if length_video1 > length_video2:
         for i in range (length_video2, length_video1):
@@ -879,14 +889,14 @@ def main():
     #renaming frames so its back to start at zero
     if cut_video1:
          #renaming frames of video 1 so it starts at frame 0
-         print ('renaming Andi')
+         
          for i in range (0 , int(length_frames_folder/2)):
               os.rename('./primary_frames_annotated/'+video1+'_frame_' + str(i+abs(mark1-mark2)) + '.jpg' ,'./primary_frames_annotated/'+video1+'_frame_' + str(i) + '.jpg')
               os.rename('./frames/'+video1+'_frame_' + str(i+abs(mark1-mark2)) + '.jpg' ,'./frames/'+video1+'_frame_' + str(i) + '.jpg')
 
     else:
          #renaming frames of video 2 so it starts at frame 0
-         print ('renaming Andriy')
+         
          for i in range (0, int(length_frames_folder/2)):
               os.rename('./secondary_frames_annotated/'+video2+'_frame_' + str(i+abs(mark1-mark2)) + '.jpg', './secondary_frames_annotated/'+video2+'_frame_' + str(i) + '.jpg')
               os.rename('./frames/'+video2+'_frame_' + str(i+abs(mark1-mark2)) + '.jpg', './frames/'+video2+'_frame_' + str(i) + '.jpg')
@@ -1298,7 +1308,132 @@ def main():
         # Save the resulting image
         image_path = os.path.join('segmented_frames_annotated', image_filename)
         cv2.imwrite(image_path, image)        
+
     
+
+
+    #Drawing our interpolated landmarks
+    #colors for the landmarks
+    color1 = [255, 0, 0]
+    color2 = [0, 255, 0]
+    #iterating over the images img1 are img from primary video img2 are segmented img from secondary video
+    for i in range(0, int(length_frames_folder/2)):
+         img1name = './frames/'+ video1 +'_frame_' + str(i) + '.jpg'
+         img2name = './segmented_frames/segmented_frame_' + str(i) + '.jpg'
+         img1 = cv2.imread(img1name, cv2.IMREAD_UNCHANGED)
+         img2 = cv2.imread(img2name, cv2.IMREAD_UNCHANGED)
+         wid1 = img1.shape[1]
+         hgt1 = img1.shape[0]
+         wid2 = img2.shape[1]
+         hgt2 = img2.shape[0]
+         #drawing nose landmark on segmentedframe and frame from primary video
+         #getting pixel of landmark
+         posx1 = int(wid1 *landmark_positioning_nose_1[0,i])
+         posy1 = int(hgt1 *(1-landmark_positioning_nose_1[1,i]))
+         posx2 = int(wid2 *landmark_positioning_nose_1[0,int(length_frames_folder/2) +i])
+         posy2 = int(hgt2 *(1-landmark_positioning_nose_1[1,int(length_frames_folder/2) +i]))
+
+         #drawing point with 5x5 pixel
+         for j in range(posx1-2, posx1+2):
+             for k in range(posy1-2, posy1+2):
+                 if j >= 0 and j < wid1:
+                     if k >= 0 and k < hgt1:
+                         img1[k][j] = color1
+         for j in range(posx2-2, posx2+2):
+             for k in range(posy2-2, posy2+2):
+                 if j >= 0 and j < wid2:
+                     if k >= 0 and k < hgt2:
+                         img2[k][j] = color2
+         #drawing other landmarks
+
+         #drawing left wrist landmark on segmentedframe and frame from primary video
+         #getting pixel of landmark
+         posx1 = int(wid1 *landmark_positioning_left_wrist_1[0,i])
+         posy1 = int(hgt1 *(1-landmark_positioning_left_wrist_1[1,i]))
+         posx2 = int(wid2 *landmark_positioning_left_wrist_1[0,int(length_frames_folder/2) +i])
+         posy2 = int(hgt2 *(1-landmark_positioning_left_wrist_1[1,int(length_frames_folder/2) +i]))
+
+         #drawing point with 5x5 pixel
+         for j in range(posx1-2, posx1+2):
+             for k in range(posy1-2, posy1+2):
+                 if j >= 0 and j < wid1:
+                     if k >= 0 and k < hgt1:
+                         img1[k][j] = color1
+         for j in range(posx2-2, posx2+2):
+             for k in range(posy2-2, posy2+2):
+                 if j >= 0 and j < wid2:
+                     if k >= 0 and k < hgt2:
+                         img2[k][j] = color2
+
+            
+         #drawing right wrist landmark on segmentedframe and frame from primary video
+         #getting pixel of landmark
+         posx1 = int(wid1 *landmark_positioning_right_wrist_1[0,i])
+         posy1 = int(hgt1 *(1-landmark_positioning_right_wrist_1[1,i]))
+         posx2 = int(wid2 *landmark_positioning_right_wrist_1[0,int(length_frames_folder/2) +i])
+         posy2 = int(hgt2 *(1-landmark_positioning_right_wrist_1[1,int(length_frames_folder/2) +i]))
+
+         #drawing point with 5x5 pixel
+
+         for j in range(posx1-2, posx1+2):
+             for k in range(posy1-2, posy1+2):
+                 if j >= 0 and j < wid1:
+                     if k >= 0 and k < hgt1:
+                         img1[k][j] = color1
+         for j in range(posx2-2, posx2+2):
+             for k in range(posy2-2, posy2+2):
+                 if j >= 0 and j < wid2:
+                     if k >= 0 and k < hgt2:
+                         img2[k][j] = color2
+
+
+         #drawing left ankle landmark on segmentedframe and frame from primary video
+         #getting pixel of landmark
+         posx1 = int(wid1 *landmark_positioning_left_ankle_1[0,i])
+         posy1 = int(hgt1 *(1-landmark_positioning_left_ankle_1[1,i]))
+         posx2 = int(wid2 *landmark_positioning_left_ankle_1[0,int(length_frames_folder/2) +i])
+         posy2 = int(hgt2 *(1-landmark_positioning_left_ankle_1[1,int(length_frames_folder/2) +i]))
+
+         #drawing point with 5x5 pixel
+         for j in range(posx1-2, posx1+2):
+             for k in range(posy1-2, posy1+2):
+                 if j >= 0 and j < wid1:
+                     if k >= 0 and k < hgt1:
+                         img1[k][j] = color1
+         for j in range(posx2-2, posx2+2):
+             for k in range(posy2-2, posy2+2):
+                 if j >= 0 and j < wid2:
+                     if k >= 0 and k < hgt2:
+                         img2[k][j] = color2
+
+            
+         #drawing right ankle on segmentedframe and frame from primary video
+         #getting pixel of landmark
+         posx1 = int(wid1 *landmark_positioning_right_ankle_1[0,i])
+         posy1 = int(hgt1 *(1-landmark_positioning_right_ankle_1[1,i]))
+         posx2 = int(wid2 *landmark_positioning_right_ankle_1[0,int(length_frames_folder/2) +i])
+         posy2 = int(hgt2 *(1-landmark_positioning_right_ankle_1[1,int(length_frames_folder/2) +i]))
+
+         #drawing point with 5x5 pixel
+         for j in range(posx1-2, posx1+2):
+             for k in range(posy1-2, posy1+2):
+                 if j >= 0 and j < wid1:
+                     if k >= 0 and k < hgt1:
+                         img1[k][j] = color1
+         for j in range(posx2-2, posx2+2):
+             for k in range(posy2-2, posy2+2):
+                 if j >= 0 and j < wid2:
+                     if k >= 0 and k < hgt2:
+                         img2[k][j] = color2
+
+
+         #saving images
+         img1name = './frames_annotated_interpolation/frames_annotated_interpolation_'+ str(i) +'.jpg'
+         img2name = './segmented_frames_annotated_interpolation/segmented_frames_annotated_interpolation_'+str(i)+'.jpg'
+         cv2.imwrite(img1name, img1)
+         cv2.imwrite(img2name, img2)
+
+
 
     # Overlay images for comparison
 
@@ -1359,7 +1494,6 @@ def main():
 
 
 
-    #delete untill here?
 
 
 
