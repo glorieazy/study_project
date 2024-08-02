@@ -1329,9 +1329,9 @@ def main():
          #drawing nose landmark on segmentedframe and frame from primary video
          #getting pixel of landmark
          posx1 = int(wid1 *landmark_positioning_nose_1[0,i])
-         posy1 = int(hgt1 *(1-landmark_positioning_nose_1[1,i]))
+         posy1 = int(hgt1 *(landmark_positioning_nose_1[1,i]))
          posx2 = int(wid2 *landmark_positioning_nose_1[0,int(length_frames_folder/2) +i])
-         posy2 = int(hgt2 *(1-landmark_positioning_nose_1[1,int(length_frames_folder/2) +i]))
+         posy2 = int(hgt2 *(landmark_positioning_nose_1[1,int(length_frames_folder/2) +i]))
 
          #drawing point with 5x5 pixel
          for j in range(posx1-2, posx1+2):
@@ -1349,9 +1349,9 @@ def main():
          #drawing left wrist landmark on segmentedframe and frame from primary video
          #getting pixel of landmark
          posx1 = int(wid1 *landmark_positioning_left_wrist_1[0,i])
-         posy1 = int(hgt1 *(1-landmark_positioning_left_wrist_1[1,i]))
+         posy1 = int(hgt1 *(landmark_positioning_left_wrist_1[1,i]))
          posx2 = int(wid2 *landmark_positioning_left_wrist_1[0,int(length_frames_folder/2) +i])
-         posy2 = int(hgt2 *(1-landmark_positioning_left_wrist_1[1,int(length_frames_folder/2) +i]))
+         posy2 = int(hgt2 *(landmark_positioning_left_wrist_1[1,int(length_frames_folder/2) +i]))
 
          #drawing point with 5x5 pixel
          for j in range(posx1-2, posx1+2):
@@ -1369,9 +1369,9 @@ def main():
          #drawing right wrist landmark on segmentedframe and frame from primary video
          #getting pixel of landmark
          posx1 = int(wid1 *landmark_positioning_right_wrist_1[0,i])
-         posy1 = int(hgt1 *(1-landmark_positioning_right_wrist_1[1,i]))
+         posy1 = int(hgt1 *(landmark_positioning_right_wrist_1[1,i]))
          posx2 = int(wid2 *landmark_positioning_right_wrist_1[0,int(length_frames_folder/2) +i])
-         posy2 = int(hgt2 *(1-landmark_positioning_right_wrist_1[1,int(length_frames_folder/2) +i]))
+         posy2 = int(hgt2 *(landmark_positioning_right_wrist_1[1,int(length_frames_folder/2) +i]))
 
          #drawing point with 5x5 pixel
 
@@ -1390,9 +1390,9 @@ def main():
          #drawing left ankle landmark on segmentedframe and frame from primary video
          #getting pixel of landmark
          posx1 = int(wid1 *landmark_positioning_left_ankle_1[0,i])
-         posy1 = int(hgt1 *(1-landmark_positioning_left_ankle_1[1,i]))
+         posy1 = int(hgt1 *(landmark_positioning_left_ankle_1[1,i]))
          posx2 = int(wid2 *landmark_positioning_left_ankle_1[0,int(length_frames_folder/2) +i])
-         posy2 = int(hgt2 *(1-landmark_positioning_left_ankle_1[1,int(length_frames_folder/2) +i]))
+         posy2 = int(hgt2 *(landmark_positioning_left_ankle_1[1,int(length_frames_folder/2) +i]))
 
          #drawing point with 5x5 pixel
          for j in range(posx1-2, posx1+2):
@@ -1410,9 +1410,9 @@ def main():
          #drawing right ankle on segmentedframe and frame from primary video
          #getting pixel of landmark
          posx1 = int(wid1 *landmark_positioning_right_ankle_1[0,i])
-         posy1 = int(hgt1 *(1-landmark_positioning_right_ankle_1[1,i]))
+         posy1 = int(hgt1 *(landmark_positioning_right_ankle_1[1,i]))
          posx2 = int(wid2 *landmark_positioning_right_ankle_1[0,int(length_frames_folder/2) +i])
-         posy2 = int(hgt2 *(1-landmark_positioning_right_ankle_1[1,int(length_frames_folder/2) +i]))
+         posy2 = int(hgt2 *(landmark_positioning_right_ankle_1[1,int(length_frames_folder/2) +i]))
 
          #drawing point with 5x5 pixel
          for j in range(posx1-2, posx1+2):
