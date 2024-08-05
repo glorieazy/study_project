@@ -1513,7 +1513,7 @@ def main():
         hgt = image1.shape[0]
 
         # Resize image for aligning the body
-        image2 = cv2.resize(image2,(wid, hgt)) # Original shape: (848, 478, 3)
+        #image2 = cv2.resize(image2,(wid, hgt)) # Original shape: (848, 478, 3)
             
         
         '''# Compute relevant region around both bodies for overlaying
@@ -1547,7 +1547,84 @@ def main():
         diff_y = bottom_y_1 - top_y_1 - (bottom_y_2-top_y_2)'''
         
         alpha = 0.5  # Factor for transparency
+        
+        nose_y_1 = nose_landmark_1.y
+        nose_x_1 = nose_landmark_1.x
+        nose_y_2 = nose_landmark_2.y
+        nose_x_2 = nose_landmark_2.x
+        right_ankle_x_1 = right_ankle_landmark_1.x
+        left_ankle_x_1 = left_ankle_landmark_1.x
+        right_ankle_y_1 = right_ankle_landmark_1.y
+        right_ankle_x_2 = right_ankle_landmark_2.x
+        left_ankle_x_2 = left_ankle_landmark_2.x
+        right_ankle_y_2 = right_ankle_landmark_2.y
 
+        #estimateing factor for stretching in width and height
+
+        height_scaling_1 = nose_y_1 - right_ankle_y_1
+        height_scaling_2 = nose_y_2 - right_ankle_y_2
+        height_scaling = height_scaling_1 / height_scaling_2
+
+        width_scaling_1 = left_ankle_x_1 - right_ankle_x_1
+        width_scaling_2 = left_ankle_x_2 - right_ankle_x_2
+        width_scaling = width_scaling_1 / width_scaling_2
+
+        width2 = int(wid * width_scaling)
+        height2 = int(hgt * height_scaling)
+
+        #rescaling image 2 to the corect scale
+        image2 = cv2.resize(image2, (width2,height2))
+
+        #getting nose landmark position for both images
+        nose_pixel_y_1 = int(nose_y_1 * hgt)
+        nose_pixel_x_1 = int(nose_x_1 * wid)
+        nose_pixel_y_2 = int(nose_y_2 * height2)
+        nose_pixel_x_2 = int(nose_x_2 * width2)
+
+        #cheking pixel limit for both images
+     
+        area_height_1 = hgt - nose_pixel_y_1
+
+        area_right_1 = wid - nose_pixel_x_1 
+
+        area_bottom_1 = nose_pixel_y_1
+
+        area_left_1 = nose_pixel_x_1 
+
+
+        area_height_2 = height2 - nose_pixel_y_2
+
+        area_right_2 = width2 - nose_pixel_x_2 
+
+        area_bottom_2 = nose_pixel_y_2
+
+        area_left_2 = nose_pixel_x_2 
+
+ 
+
+
+
+
+        area_height = min(area_height_1 , area_height_2) 
+        area_right = min(area_right_1 , area_right_2) 
+        area_bottom = min(area_bottom_1 , area_bottom_2) 
+        area_left = min(area_left_1 , area_left_2) 
+
+        #getting overlay area area
+        top_1 = nose_pixel_y_1 + area_height
+        top_2 = nose_pixel_y_2 + area_height
+        bottom_1 = nose_pixel_y_1 - area_bottom
+        bottom_2 = nose_pixel_y_2 - area_bottom
+        right_1 = nose_pixel_x_1 + area_right 
+        right_2 = nose_pixel_x_2 + area_right
+        left_1 = nose_pixel_x_1 - area_left
+        left_2 = nose_pixel_x_2 - area_left
+
+        #overlaying the images
+
+        image1[bottom_1 : top_1 , left_1 : right_1 , :] = np.uint8(image1[bottom_1 : top_1 , left_1 : right_1 , :] * alpha + image2[(bottom_2 ) : (top_2 ) , (left_2 ) : (right_2 ) , :] * (1 - alpha))
+
+        
         '''# Distribute the differences in width and height of both regions evenly
 
         if diff_x < 0:
@@ -1583,7 +1660,7 @@ def main():
                 image2[top_y_2-int(diff_y/4):bottom_y_2+int(diff_y/4), right_x_2-int(diff_x/4):left_x_2+int(diff_x/4), :]   * (1-alpha)
             )    '''
         
-        image1 = image1 * alpha + image2 * (1-alpha)
+        #image1 = image1 * alpha + image2 * (1-alpha)
 
         # Generate a unique filename for the combined image
         combined_image_filename = f'combined_image_{idx}.jpg'  
