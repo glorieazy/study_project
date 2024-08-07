@@ -826,12 +826,7 @@ def main():
 
 
 
-    '''
-    print(mark1)
-    print(mark2)
-    print(length_video1)
-    print(length_video2)
-    '''
+
     #cutting frames at the end so that both video have same length
     if length_video1 > length_video2:
         for i in range (length_video2, length_video1):
@@ -966,7 +961,7 @@ def main():
 
 
 
-    '''WiMa Code'''
+
 
 
 
@@ -1511,6 +1506,8 @@ def main():
 
         wid = image1.shape[1]
         hgt = image1.shape[0]
+        width2 = image2.shape[1]
+        height2 = image2.shape[0]
 
         # Resize image for aligning the body
         #image2 = cv2.resize(image2,(wid, hgt)) # Original shape: (848, 478, 3)
@@ -1569,8 +1566,8 @@ def main():
         width_scaling_2 = left_ankle_x_2 - right_ankle_x_2
         width_scaling = width_scaling_1 / width_scaling_2
 
-        width2 = int(wid * width_scaling)
-        height2 = int(hgt * height_scaling)
+        width2 = int(width2 * width_scaling)
+        height2 = int(height2 * height_scaling)
 
         #rescaling image 2 to the corect scale
         image2 = cv2.resize(image2, (width2,height2))
