@@ -72,6 +72,11 @@ def main():
     for file_name in os.listdir(folder):
         file_path = './segmented_frames_annotated_interpolation/' + file_name
         os.remove(file_path)
+
+    folder = 'combined_image_interpolation'
+    for file_name in os.listdir(folder):
+        file_path = './combined_image_interpolation/' + file_name
+        os.remove(file_path)
     
     # ######################
     # ### starts manager ###
@@ -192,6 +197,8 @@ def main():
     landmark_positioning_right_ankle_1 = np.zeros((2,length_frames_folder),dtype = float)
     #landmark_positioning_right_ankle_2 = np.zeros((2,length_frames_folder/2),dtype = float)
 
+    
+
     #checking if video is serve or not
     if 'serve' in video1:
          if 'serve' in video2:
@@ -227,13 +234,40 @@ def main():
             min_detection_confidence=0.5) as pose:
                 
                 image = frames_folder[index]
-                current_frames_path = os.path.join(frames_folder_path, image) 
+                current_frames_path = './frames/'+ video1 +'_frame_' + str(index) + '.jpg'
                 current_image = cv2.imread(current_frames_path)
+                print (current_frames_path)
                 if index == number-1:
-                    print('detecting bad frames done')
+
+                                        #copying landmark for last frame
+
+                    results_1 = pose.process(cv2.cvtColor(current_image, cv2.COLOR_BGR2RGB))
+
+
+                    nose_landmark_1 = results_1.pose_landmarks.landmark[mp_pose.PoseLandmark.NOSE] if results_1.pose_landmarks else None
+                    landmark_positioning_nose_1[0,index] = nose_landmark_1.x
+                    landmark_positioning_nose_1[1,index] = nose_landmark_1.y
+                    
+                    left_wrist_landmark_1 = results_1.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_WRIST] if results_1.pose_landmarks else None
+                    landmark_positioning_left_wrist_1[0,index] = left_wrist_landmark_1.x
+                    landmark_positioning_left_wrist_1[1,index] = left_wrist_landmark_1.y
+
+                    right_wrist_landmark_1 = results_1.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_WRIST] if results_1.pose_landmarks else None
+                    landmark_positioning_right_wrist_1[0,index] = right_wrist_landmark_1.x
+                    landmark_positioning_right_wrist_1[1,index] = right_wrist_landmark_1.y
+
+                    left_ankle_landmark_1 = results_1.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_ANKLE] if results_1.pose_landmarks else None
+                    landmark_positioning_left_ankle_1[0,index] = left_ankle_landmark_1.x
+                    landmark_positioning_left_ankle_1[1,index] = left_ankle_landmark_1.y
+                    
+
+                    right_ankle_landmark_1 = results_1.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_ANKLE] if results_1.pose_landmarks else None
+                    landmark_positioning_right_ankle_1[0,index] = right_ankle_landmark_1.x
+                    landmark_positioning_right_ankle_1[1,index] = right_ankle_landmark_1.y
+                    
                     break
                 next_frame = frames_folder[index+1]
-                next_frames_path = os.path.join(frames_folder_path,next_frame)
+                next_frames_path = './frames/'+ video1 +'_frame_' + str(index+1) + '.jpg'
 
                 
                 next_image = cv2.imread(next_frames_path)
@@ -272,13 +306,14 @@ def main():
                 if landmark_positioning_right_ankle_1[0,index] == 0:
                     landmark_positioning_right_ankle_1[0,index] = right_ankle_landmark_1.x
                     landmark_positioning_right_ankle_1[1,index] = right_ankle_landmark_1.y
-
+                
                 # Check if nose landmarks are detected in both images
+                '''
                 if nose_landmark_1 and nose_landmark_2:
                     dx = nose_landmark_1.x - nose_landmark_2.x
                     dy = nose_landmark_1.y - nose_landmark_2.y  
                     counter = 0
-                    '''change (interpolate) coordinates nose_landmark_between.x or y to point between nose_landmark_1.x or y und nose_landmark_2.x or y with help of counter if more than one frame is bad'''
+                    #change (interpolate) coordinates nose_landmark_between.x or y to point between nose_landmark_1.x or y und nose_landmark_2.x or y with help of counter if more than one frame is bad
                     # Check if landmarks move unrealisticly much
                     while dx > 0.02 or dx < -0.02 or dy > 0.02 or dy < -0.02 :
                         counter = counter + 1
@@ -493,7 +528,7 @@ def main():
                                        
                 else:
                     print('No right ankle detected')                                        
-
+                '''
                     
 
 
@@ -517,13 +552,37 @@ def main():
             min_detection_confidence=0.5) as pose:
                 
                 image = frames_folder[index]
-                current_frames_path = os.path.join(frames_folder_path, image) 
+                current_frames_path = './frames/'+ video2 +'_frame_' + str(index - number) + '.jpg'
                 current_image = cv2.imread(current_frames_path)
                 if index == length_frames_folder-1:
-                    print('detecting bad frames done')
+                    #copying landmark for last frame
+
+                    results_1 = pose.process(cv2.cvtColor(current_image, cv2.COLOR_BGR2RGB))
+
+
+                    nose_landmark_1 = results_1.pose_landmarks.landmark[mp_pose.PoseLandmark.NOSE] if results_1.pose_landmarks else None
+                    landmark_positioning_nose_1[0,index] = nose_landmark_1.x
+                    landmark_positioning_nose_1[1,index] = nose_landmark_1.y
+                    
+                    left_wrist_landmark_1 = results_1.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_WRIST] if results_1.pose_landmarks else None
+                    landmark_positioning_left_wrist_1[0,index] = left_wrist_landmark_1.x
+                    landmark_positioning_left_wrist_1[1,index] = left_wrist_landmark_1.y
+
+                    right_wrist_landmark_1 = results_1.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_WRIST] if results_1.pose_landmarks else None
+                    landmark_positioning_right_wrist_1[0,index] = right_wrist_landmark_1.x
+                    landmark_positioning_right_wrist_1[1,index] = right_wrist_landmark_1.y
+
+                    left_ankle_landmark_1 = results_1.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_ANKLE] if results_1.pose_landmarks else None
+                    landmark_positioning_left_ankle_1[0,index] = left_ankle_landmark_1.x
+                    landmark_positioning_left_ankle_1[1,index] = left_ankle_landmark_1.y
+                    
+
+                    right_ankle_landmark_1 = results_1.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_ANKLE] if results_1.pose_landmarks else None
+                    landmark_positioning_right_ankle_1[0,index] = right_ankle_landmark_1.x
+                    landmark_positioning_right_ankle_1[1,index] = right_ankle_landmark_1.y
                     break
                 next_frame = frames_folder[index+1]
-                next_frames_path = os.path.join(frames_folder_path,next_frame)
+                next_frames_path = './frames/'+ video2 +'_frame_' + str(index+1-number) + '.jpg'
 
                 
                 next_image = cv2.imread(next_frames_path)
@@ -538,18 +597,21 @@ def main():
                 if landmark_positioning_nose_1[0,index] == 0:
                     landmark_positioning_nose_1[0,index] = nose_landmark_1.x
                     landmark_positioning_nose_1[1,index] = nose_landmark_1.y
+                 
 
                 left_wrist_landmark_1 = results_1.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_WRIST] if results_1.pose_landmarks else None
                 left_wrist_landmark_2 = results_2.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_WRIST] if results_2.pose_landmarks else None
                 if landmark_positioning_left_wrist_1[0,index] == 0:
                     landmark_positioning_left_wrist_1[0,index] = left_wrist_landmark_1.x
                     landmark_positioning_left_wrist_1[1,index] = left_wrist_landmark_1.y
+                  
 
                 right_wrist_landmark_1 = results_1.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_WRIST] if results_1.pose_landmarks else None
                 right_wrist_landmark_2 = results_2.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_WRIST] if results_2.pose_landmarks else None
                 if landmark_positioning_right_wrist_1[0,index] == 0:
                     landmark_positioning_right_wrist_1[0,index] = right_wrist_landmark_1.x
                     landmark_positioning_right_wrist_1[1,index] = right_wrist_landmark_1.y
+                    
 
                 left_ankle_landmark_1 = results_1.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_ANKLE] if results_1.pose_landmarks else None
                 left_ankle_landmark_2 = results_2.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_ANKLE] if results_2.pose_landmarks else None
@@ -562,13 +624,13 @@ def main():
                 if landmark_positioning_right_ankle_1[0,index] == 0:
                     landmark_positioning_right_ankle_1[0,index] = right_ankle_landmark_1.x
                     landmark_positioning_right_ankle_1[1,index] = right_ankle_landmark_1.y
-
+                '''
                 # Check if nose landmarks are detected in both images
                 if nose_landmark_1 and nose_landmark_2:
                     dx = nose_landmark_1.x - nose_landmark_2.x
                     dy = nose_landmark_1.y - nose_landmark_2.y  
                     counter = 0
-                    '''change (interpolate) coordinates nose_landmark_between.x or y to point between nose_landmark_1.x or y und nose_landmark_2.x or y with help of counter if more than one frame is bad'''
+                    #change (interpolate) coordinates nose_landmark_between.x or y to point between nose_landmark_1.x or y und nose_landmark_2.x or y with help of counter if more than one frame is bad
                     # Check if landmarks move unrealisticly much
                     while dx > 0.02 or dx < -0.02 or dy > 0.02 or dy < -0.02 :
                         counter = counter + 1
@@ -778,8 +840,239 @@ def main():
                                        
                 else:
                     print('No right ankle detected')                                        
+                '''
+   
+
+    #detecting bad frames and interpolating
+
+    #first video
+    for i in range(1, number):
+     #checking x coords
+     #checking nose
+        value1 = landmark_positioning_nose_1[0,i]
+
+        value2 = landmark_positioning_nose_1[0,i-1]
+
+        dx = abs(value1 -value2)
+        if dx > 0.5:
+            landmark_positioning_nose_1[0,i] = (landmark_positioning_nose_1[0,i+1]+landmark_positioning_nose_1[0,i-1]) /2
+         #checking right wrist
+        value1 = landmark_positioning_right_wrist_1[0,i]
+
+        value2 = landmark_positioning_right_wrist_1[0,i-1]
+
+        dx = abs(value1 -value2)
+        if dx > 0.5:
+            landmark_positioning_right_wrist_1[0,i] = (landmark_positioning_right_wrist_1[0,i+1]+landmark_positioning_right_wrist_1[0,i-1]) /2
+        
+        
+        #checking left wrist
+        value1 = landmark_positioning_left_wrist_1[0,i]
+
+        value2 = landmark_positioning_left_wrist_1[0,i-1]
+
+        dx = abs(value1 -value2)
+        if dx > 0.5:
+            landmark_positioning_left_wrist_1[0,i] = (landmark_positioning_left_wrist_1[0,i+1]+landmark_positioning_left_wrist_1[0,i-1]) /2
+
+
+        #checking right ankle
+        value1 = landmark_positioning_right_ankle_1[0,i]
+
+        value2 = landmark_positioning_right_ankle_1[0,i-1]
+
+        if dx > 0.5:
+            landmark_positioning_right_ankle_1[0,i] = (landmark_positioning_right_ankle_1[0,i+1]+landmark_positioning_right_ankle_1[0,i-1]) /2
+        
+        
+        #checking left wrist
+        value1 = landmark_positioning_left_ankle_1[0,i]
+
+        value2 = landmark_positioning_left_ankle_1[0,i-1]
+
+
+        dx = abs(value1 -value2)
+        if dx > 0.5:
+            landmark_positioning_left_wrist_1[0,i] = (landmark_positioning_left_ankle_1[0,i+1]+landmark_positioning_left_ankle_1[0,i-1]) /2
+     
+        #cheking y coords
+        #checking nose
+        value1 = landmark_positioning_nose_1[1,i]
+
+        value2 = landmark_positioning_nose_1[1,i-1]
+
+        dx = abs(value1 -value2)
+        if dx > 0.5:
+            landmark_positioning_nose_1[1,i] = (landmark_positioning_nose_1[1,i+1]+landmark_positioning_nose_1[1,i-1]) /2
+         #checking right wrist
+        value1 = landmark_positioning_right_wrist_1[1,i]
+
+        value2 = landmark_positioning_right_wrist_1[1,i-1]
+
+        dx = abs(value1 -value2)
+        if dx > 0.5:
+            landmark_positioning_right_wrist_1[1,i] = (landmark_positioning_right_wrist_1[1,i+1]+landmark_positioning_right_wrist_1[1,i-1]) /2
+        
+        
+        #checking left wrist
+        value1 = landmark_positioning_left_wrist_1[1,i]
+
+        value2 = landmark_positioning_left_wrist_1[1,i-1]
+
+        dx = abs(value1 -value2)
+        if dx > 0.5:
+            landmark_positioning_left_wrist_1[1,i] = (landmark_positioning_left_wrist_1[1,i+1]+landmark_positioning_left_wrist_1[1,i-1]) /2
+
+
+        #checking right ankle
+        value1 = landmark_positioning_right_ankle_1[1,i]
+
+        value2 = landmark_positioning_right_ankle_1[1,i-1]
+
+        if dx > 0.5:
+            landmark_positioning_right_ankle_1[1,i] = (landmark_positioning_right_ankle_1[1,i+1]+landmark_positioning_right_ankle_1[1,i-1]) /2
+        
+        
+        #checking left wrist
+        value1 = landmark_positioning_left_ankle_1[1,i]
+
+        value2 = landmark_positioning_left_ankle_1[1,i-1]
+
+
+        dx = abs(value1 -value2)
+        if dx > 0.5:
+            landmark_positioning_left_wrist_1[1,i] = (landmark_positioning_left_ankle_1[1,i+1]+landmark_positioning_left_ankle_1[1,i-1]) /2
+            
+    
+
+    #secondary video
+        for i in range(number+1, length_frames_folder):
+     #checking x coords
+     #checking nose
+            value1 = landmark_positioning_nose_1[0,i]
+
+            value2 = landmark_positioning_nose_1[0,i-1]
+
+            dx = abs(value1 -value2)
+            if dx > 0.5:
+                landmark_positioning_nose_1[0,i] = (landmark_positioning_nose_1[0,i+1]+landmark_positioning_nose_1[0,i-1]) /2
+            #checking right wrist
+            value1 = landmark_positioning_right_wrist_1[0,i]
+
+            value2 = landmark_positioning_right_wrist_1[0,i-1]
+
+            dx = abs(value1 -value2)
+            if dx > 0.5:
+                landmark_positioning_right_wrist_1[0,i] = (landmark_positioning_right_wrist_1[0,i+1]+landmark_positioning_right_wrist_1[0,i-1]) /2
+            
+            
+            #checking left wrist
+            value1 = landmark_positioning_left_wrist_1[0,i]
+
+            value2 = landmark_positioning_left_wrist_1[0,i-1]
+
+            dx = abs(value1 -value2)
+            if dx > 0.5:
+                landmark_positioning_left_wrist_1[0,i] = (landmark_positioning_left_wrist_1[0,i+1]+landmark_positioning_left_wrist_1[0,i-1]) /2
+
+
+            #checking right ankle
+            value1 = landmark_positioning_right_ankle_1[0,i]
+
+            value2 = landmark_positioning_right_ankle_1[0,i-1]
+
+            if dx > 0.5:
+                landmark_positioning_right_ankle_1[0,i] = (landmark_positioning_right_ankle_1[0,i+1]+landmark_positioning_right_ankle_1[0,i-1]) /2
+            
+            
+            #checking left wrist
+            value1 = landmark_positioning_left_ankle_1[0,i]
+
+            value2 = landmark_positioning_left_ankle_1[0,i-1]
+
+
+            dx = abs(value1 -value2)
+            if dx > 0.5:
+                landmark_positioning_left_wrist_1[0,i] = (landmark_positioning_left_ankle_1[0,i+1]+landmark_positioning_left_ankle_1[0,i-1]) /2
+        
+            #cheking y coords
+            #checking nose
+            value1 = landmark_positioning_nose_1[1,i]
+
+            value2 = landmark_positioning_nose_1[1,i-1]
+
+            dx = abs(value1 -value2)
+            if dx > 0.5:
+                landmark_positioning_nose_1[1,i] = (landmark_positioning_nose_1[1,i+1]+landmark_positioning_nose_1[1,i-1]) /2
+            #checking right wrist
+            value1 = landmark_positioning_right_wrist_1[1,i]
+
+            value2 = landmark_positioning_right_wrist_1[1,i-1]
+
+            dx = abs(value1 -value2)
+            if dx > 0.5:
+                landmark_positioning_right_wrist_1[1,i] = (landmark_positioning_right_wrist_1[1,i+1]+landmark_positioning_right_wrist_1[1,i-1]) /2
+            
+            
+            #checking left wrist
+            value1 = landmark_positioning_left_wrist_1[1,i]
+
+            value2 = landmark_positioning_left_wrist_1[1,i-1]
+
+            dx = abs(value1 -value2)
+            if dx > 0.5:
+                landmark_positioning_left_wrist_1[1,i] = (landmark_positioning_left_wrist_1[1,i+1]+landmark_positioning_left_wrist_1[1,i-1]) /2
+
+
+            #checking right ankle
+            value1 = landmark_positioning_right_ankle_1[1,i]
+
+            value2 = landmark_positioning_right_ankle_1[1,i-1]
+
+            if dx > 0.5:
+                landmark_positioning_right_ankle_1[1,i] = (landmark_positioning_right_ankle_1[1,i+1]+landmark_positioning_right_ankle_1[1,i-1]) /2
+            
+            
+            #checking left wrist
+            value1 = landmark_positioning_left_ankle_1[1,i]
+
+            value2 = landmark_positioning_left_ankle_1[1,i-1]
+
+
+            dx = abs(value1 -value2)
+            if dx > 0.5:
+                landmark_positioning_left_wrist_1[1,i] = (landmark_positioning_left_ankle_1[1,i+1]+landmark_positioning_left_ankle_1[1,i-1]) /2
+
+
+
+   
+
+
+
+    #getting frame for synchronizing         
+    for i in range (0 , number):
+        if serve:
+            if landmark_positioning_right_wrist_1[1,i] > highest_hand1:
+                highest_hand1 = landmark_positioning_right_wrist_1[1,i]
+                mark1 = i
+        else:
+            if landmark_positioning_right_wrist_1[0,i] < highest_hand1:
+                highest_hand1 = landmark_positioning_right_wrist_1[0,i]
+                mark1 = i
+
+    for i in range (number , length_frames_folder):
+        if serve:
+            if landmark_positioning_right_wrist_1[1,i] > highest_hand2:
+                highest_hand2 = landmark_positioning_right_wrist_1[1,i]
+                mark2 = i - number
+        else:
+            if landmark_positioning_right_wrist_1[0,i] < highest_hand1:
+                highest_hand2 = landmark_positioning_right_wrist_1[0,i]
+                mark2 = i - number 
 
     print(landmark_positioning_nose_1)
+    print(mark1)
+    print(mark2)
     #cutting frames at the front so that the moment for synchronizing is at the same frame number
     if mark1 > mark2:
         for i in range (0, mark1-mark2):
@@ -839,11 +1132,11 @@ def main():
             #deleting corresponding landmark info
 
             
-            landmark_positioning_nose_1 = np.delete(landmark_positioning_nose_1,length_video2,1)
-            landmark_positioning_left_wrist_1 = np.delete(landmark_positioning_left_wrist_1,length_video2,1)
-            landmark_positioning_right_wrist_1 = np.delete(landmark_positioning_right_wrist_1,length_video2,1)
-            landmark_positioning_left_ankle_1 = np.delete(landmark_positioning_left_ankle_1,length_video2,1)
-            landmark_positioning_right_ankle_1 = np.delete(landmark_positioning_right_ankle_1,length_video2,1)
+            landmark_positioning_nose_1 = np.delete(landmark_positioning_nose_1,length_video2-1,1)
+            landmark_positioning_left_wrist_1 = np.delete(landmark_positioning_left_wrist_1,length_video2-1,1)
+            landmark_positioning_right_wrist_1 = np.delete(landmark_positioning_right_wrist_1,length_video2-1,1)
+            landmark_positioning_left_ankle_1 = np.delete(landmark_positioning_left_ankle_1,length_video2-1,1)
+            landmark_positioning_right_ankle_1 = np.delete(landmark_positioning_right_ankle_1,length_video2-1,1)
 
 
     else:
@@ -855,7 +1148,7 @@ def main():
             os.remove(file_path)
             file_path = './frames/'+video2+'_frame_' + str(index+abs(mark1-mark2)) + '.jpg'
             os.remove(file_path)
-            print(index)
+            #print(index)
             #deleting corresponding landmark info
             landmark_positioning_nose_1 = np.delete(landmark_positioning_nose_1,int(length_video1*2),1)
             landmark_positioning_left_wrist_1 = np.delete(landmark_positioning_left_wrist_1,int(length_video1*2),1)
@@ -1513,36 +1806,6 @@ def main():
         #image2 = cv2.resize(image2,(wid, hgt)) # Original shape: (848, 478, 3)
             
         
-        '''# Compute relevant region around both bodies for overlaying
-
-        nose_y_1 = int(nose_landmark_1.y * image1.shape[0])        # reference point for the top edge of the first region
-        nose_y_2 = int(nose_landmark_2.y * image2.shape[0])        # reference point for the top edge of the second region
-
-        l_heel_x_1 = int(left_heel_landmark1.x * image1.shape[1])  # reference point for the left edge of the first region
-        l_heel_x_2 = int(left_heel_landmark2.x * image2.shape[1])  # reference point for the left edge of the second region
-        l_heel_y_1 = int(left_heel_landmark1.y * image1.shape[0])  # reference point for the bottom edge of the first region
-        l_heel_y_2 = int(left_heel_landmark2.y * image2.shape[0])  # reference point for the bottom edge of the second region
-        
-        r_heel_x_1 = int(right_heel_landmark1.x * image1.shape[1]) # reference point for the right edge of the first region
-        r_heel_x_2 = int(right_heel_landmark2.x * image2.shape[1]) # reference point for the right edge of the second region
-        r_heel_y_1 = int(right_heel_landmark1.y * image1.shape[0]) # reference point for the bottom edge of the first region
-        r_heel_y_2 = int(right_heel_landmark2.y * image2.shape[0]) # reference point for the bottom edge of the second region
-        
-        # Adjust the reference points to get the regions surrounding the corresponding body in all frames
-        
-        right_x_1 = r_heel_x_1 - 120                         
-        left_x_1 = l_heel_x_1 + 50
-        bottom_y_1 = max(r_heel_y_1 + 30 ,l_heel_y_1 + 30)
-        top_y_1 = nose_y_1 - 136
-
-        right_x_2 = r_heel_x_2 - 120
-        left_x_2 = l_heel_x_2 + 50
-        bottom_y_2 = max(r_heel_y_2 + 30 ,l_heel_y_2 + 30)
-        top_y_2 = nose_y_2 - 144
-        
-        diff_x = left_x_1-right_x_1 - (left_x_2-right_x_2) 
-        diff_y = bottom_y_1 - top_y_1 - (bottom_y_2-top_y_2)'''
-        
         alpha = 0.5  # Factor for transparency
         
         nose_y_1 = nose_landmark_1.y
@@ -1621,43 +1884,7 @@ def main():
 
         image1[bottom_1 : top_1 , left_1 : right_1 , :] = np.uint8(image1[bottom_1 : top_1 , left_1 : right_1 , :] * alpha + image2[(bottom_2 ) : (top_2 ) , (left_2 ) : (right_2 ) , :] * (1 - alpha))
 
-        
-        '''# Distribute the differences in width and height of both regions evenly
 
-        if diff_x < 0:
-            diff_x = - diff_x
-            rest_x = -(diff_x % 4)
-        else:
-            rest_x = diff_x % 4
-        
-        if diff_y < 0:
-            diff_y = - diff_y
-            rest_y = -(diff_y % 4)    
-        else:
-            rest_y = diff_y % 4
-
-        if (diff_x % 4 != 0) and (diff_y % 4 != 0):
-            image1[top_y_1+int(diff_y/4):bottom_y_1-int(diff_y/4), right_x_1+int(diff_x/4):left_x_1-int(diff_x/4), :] = np.uint8(
-                image1[top_y_1+int(diff_y/4):bottom_y_1-int(diff_y/4), right_x_1+int(diff_x/4):left_x_1-int(diff_x/4), :] * alpha +  
-                image2[top_y_2-int(diff_y/4)-rest_y:bottom_y_2+int(diff_y/4), right_x_2-int(diff_x/4)-rest_x:left_x_2+int(diff_x/4), :]   * (1-alpha)
-            )
-        elif (diff_x % 4) != 0:
-            image1[top_y_1+int(diff_y/4):bottom_y_1-int(diff_y/4), right_x_1+int(diff_x/4):left_x_1-int(diff_x/4), :] = np.uint8(
-                image1[top_y_1+int(diff_y/4):bottom_y_1-int(diff_y/4), right_x_1+int(diff_x/4):left_x_1-int(diff_x/4), :] * alpha +  
-                image2[top_y_2-int(diff_y/4):bottom_y_2+int(diff_y/4), right_x_2-int(diff_x/4)-rest_x:left_x_2+int(diff_x/4), :]   * (1-alpha)
-            )  
-        elif (diff_y % 4) != 0:
-            image1[top_y_1+int(diff_y/4):bottom_y_1-int(diff_y/4), right_x_1+int(diff_x/4):left_x_1-int(diff_x/4), :] = np.uint8(
-                image1[top_y_1+int(diff_y/4):bottom_y_1-int(diff_y/4), right_x_1+int(diff_x/4):left_x_1-int(diff_x/4), :] * alpha +  
-                image2[top_y_2-int(diff_y/4)-rest_y:bottom_y_2+int(diff_y/4), right_x_2-int(diff_x/4):left_x_2+int(diff_x/4), :]   * (1-alpha)
-            )         
-        else:
-            image1[top_y_1+int(diff_y/4):bottom_y_1-int(diff_y/4), right_x_1+int(diff_x/4):left_x_1-int(diff_x/4), :] = np.uint8(
-                image1[top_y_1+int(diff_y/4):bottom_y_1-int(diff_y/4), right_x_1+int(diff_x/4):left_x_1-int(diff_x/4), :] * alpha +  
-                image2[top_y_2-int(diff_y/4):bottom_y_2+int(diff_y/4), right_x_2-int(diff_x/4):left_x_2+int(diff_x/4), :]   * (1-alpha)
-            )    '''
-        
-        #image1 = image1 * alpha + image2 * (1-alpha)
 
         # Generate a unique filename for the combined image
         combined_image_filename = f'combined_image_{idx}.jpg'  
@@ -1666,6 +1893,127 @@ def main():
         combined_image_path = os.path.join('frames_annotated', combined_image_filename)
         cv2.imwrite(combined_image_path, image1)
 
+
+    # Folders containing relevant images
+    primary_frames_folder_path = 'frames_annotated_interpolation'
+    segmented_folder_path = 'segmented_frames_annotated_interpolation'
+    #segmented_folder_path = 'secondary_frames_annotated'
+
+    # Get lists of image filenames from both folders
+    primary_frames_folder = [filename for filename in os.listdir(primary_frames_folder_path) if filename.endswith(('.jpg', '.png', '.jpeg'))]
+    segmented_folder = [filename for filename in os.listdir(segmented_folder_path) if filename.endswith(('.jpg', '.png', '.jpeg'))]
+
+    # Sort the frames after the numbers
+    primary_frames_folder = sorted(primary_frames_folder, key=extract_number)
+    segmented_folder = sorted(segmented_folder, key=extract_number)
+
+
+    # Iterate over images pairwise from both folders 
+    for idx, (image1, image2) in enumerate(zip(primary_frames_folder, segmented_folder)):
+        
+        primary_frames_path = os.path.join(primary_frames_folder_path, image1)   
+        image1 = cv2.imread(primary_frames_path, cv2.IMREAD_UNCHANGED)
+        image1 = cv2.cvtColor(image1,cv2.COLOR_BGR2BGRA)               # Add alpha channel
+        segmented_path = os.path.join(segmented_folder_path, image2)   
+        image2 = cv2.imread(segmented_path, cv2.IMREAD_UNCHANGED)
+        image2 = cv2.cvtColor(image2,cv2.COLOR_BGR2BGRA)               # Add alpha channel
+
+
+        wid = image1.shape[1]
+        hgt = image1.shape[0]
+        width2 = image2.shape[1]
+        height2 = image2.shape[0]
+
+        # Resize image for aligning the body
+        #image2 = cv2.resize(image2,(wid, hgt)) # Original shape: (848, 478, 3)
+            
+        
+        alpha = 0.5  # Factor for transparency
+        
+        nose_y_1 = landmark_positioning_nose_1[1,idx]
+        nose_x_1 = landmark_positioning_nose_1[0,idx] 
+        nose_y_2 = landmark_positioning_nose_1[1,idx+int(length_frames_folder/2)]
+        nose_x_2 = landmark_positioning_nose_1[0,idx+int(length_frames_folder/2)]
+        right_ankle_x_1 = landmark_positioning_right_ankle_1[0,idx]
+        left_ankle_x_1 = landmark_positioning_left_ankle_1[0,idx]
+        right_ankle_y_1 = landmark_positioning_right_ankle_1[1,idx]
+        right_ankle_x_2 = landmark_positioning_right_ankle_1[0,idx+int(length_frames_folder/2)]
+        left_ankle_x_2 = landmark_positioning_left_ankle_1[0,idx+int(length_frames_folder/2)]
+        right_ankle_y_2 = landmark_positioning_right_ankle_1[1,idx+int(length_frames_folder/2)]
+
+        #estimateing factor for stretching in width and height
+
+        height_scaling_1 = nose_y_1 - right_ankle_y_1
+        height_scaling_2 = nose_y_2 - right_ankle_y_2
+        height_scaling = height_scaling_1 / height_scaling_2
+
+        width_scaling_1 = left_ankle_x_1 - right_ankle_x_1
+        width_scaling_2 = left_ankle_x_2 - right_ankle_x_2
+        width_scaling = width_scaling_1 / width_scaling_2
+
+        width2 = int(width2 * width_scaling)
+        height2 = int(height2 * height_scaling)
+
+        #rescaling image 2 to the corect scale
+        image2 = cv2.resize(image2, (width2,height2))
+
+        #getting nose landmark position for both images
+        nose_pixel_y_1 = int(nose_y_1 * hgt)
+        nose_pixel_x_1 = int(nose_x_1 * wid)
+        nose_pixel_y_2 = int(nose_y_2 * height2)
+        nose_pixel_x_2 = int(nose_x_2 * width2)
+
+        #cheking pixel limit for both images
+     
+        area_height_1 = hgt - nose_pixel_y_1
+
+        area_right_1 = wid - nose_pixel_x_1 
+
+        area_bottom_1 = nose_pixel_y_1
+
+        area_left_1 = nose_pixel_x_1 
+
+
+        area_height_2 = height2 - nose_pixel_y_2
+
+        area_right_2 = width2 - nose_pixel_x_2 
+
+        area_bottom_2 = nose_pixel_y_2
+
+        area_left_2 = nose_pixel_x_2 
+
+ 
+
+
+
+
+        area_height = min(area_height_1 , area_height_2) 
+        area_right = min(area_right_1 , area_right_2) 
+        area_bottom = min(area_bottom_1 , area_bottom_2) 
+        area_left = min(area_left_1 , area_left_2) 
+
+        #getting overlay area area
+        top_1 = nose_pixel_y_1 + area_height
+        top_2 = nose_pixel_y_2 + area_height
+        bottom_1 = nose_pixel_y_1 - area_bottom
+        bottom_2 = nose_pixel_y_2 - area_bottom
+        right_1 = nose_pixel_x_1 + area_right 
+        right_2 = nose_pixel_x_2 + area_right
+        left_1 = nose_pixel_x_1 - area_left
+        left_2 = nose_pixel_x_2 - area_left
+
+        #overlaying the images
+
+        image1[bottom_1 : top_1 , left_1 : right_1 , :] = np.uint8(image1[bottom_1 : top_1 , left_1 : right_1 , :] * alpha + image2[(bottom_2 ) : (top_2 ) , (left_2 ) : (right_2 ) , :] * (1 - alpha))
+
+
+
+        # Generate a unique filename for the combined image
+        combined_image_interpolation_filename = './combined_image_interpolation/combined_image_interpolation_'+str(idx)+'.jpg'  
+
+        # Save the resulting combined image 
+        #combined_image_path = os.path.join('frames_combined_interpolation', combined_image_interpolation_filename)
+        cv2.imwrite(combined_image_interpolation_filename, image1)
 
 
     # created annotated movie from annotated frames
@@ -1677,16 +2025,20 @@ def main():
     primary_frames_dir = 'primary_frames_annotated'
     secondary_frames_dir = 'secondary_frames_annotated'
     comparison_frames_dir = 'frames_annotated'
+    comparison_interpolation_frames_dir = 'combined_image_interpolation'
 
     # Output video file name
     primary_video_filename = 'primary_video.mp4'
     secondary_video_filename = 'secondary_video.mp4'
     comparison_video_filename = 'comparison_video.mp4'
+    comparison_interpolation_video_filename = 'comparison_interpolation_video.mp4'
+
 
     # Get the list of frames in the directory
     primary_frames = [f for f in os.listdir(primary_frames_dir) if f.endswith('.jpg')]
     secondary_frames = [f for f in os.listdir(secondary_frames_dir) if f.endswith('.jpg')]
     comparison_frames = [f for f in os.listdir(comparison_frames_dir) if f.endswith('.jpg')]
+    comparison_interpolation_frames = [f for f in os.listdir(comparison_interpolation_frames_dir) if f.endswith('.jpg')]
 
     # Sort the frames to ensure correct order
 
@@ -1698,6 +2050,7 @@ def main():
     primary_frames = sorted(primary_frames, key=extract_number)
     secondary_frames = sorted(secondary_frames, key=extract_number)
     comparison_frames = sorted(comparison_frames, key=extract_number)
+    comparison_interpolation_frames = sorted(comparison_interpolation_frames, key=extract_number)
     
     # Get the first frame to obtain frame size information
     primary_frame_path = os.path.join(primary_frames_dir, primary_frames[0])
@@ -1712,12 +2065,17 @@ def main():
     comparison_frame = cv2.imread(comparison_frame_path)
     comparison_height, comparison_width, comparison_layers = comparison_frame.shape
 
+    comparison_interpolation_frame_path = os.path.join(comparison_interpolation_frames_dir, comparison_interpolation_frames[0])
+    comparison_interpolation_frame = cv2.imread(comparison_interpolation_frame_path)
+    comparison_interpolation_height, comparison_interpolation_width, comparison_interpolation_layers = comparison_interpolation_frame.shape
+
     # Define the codec and create a VideoWriter object
     video_path = 'videos_annotated'
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
     primary_video = cv2.VideoWriter(video_path+'/primary_video.mp4', fourcc, 30.0, (primary_width, primary_height))
     secondary_video = cv2.VideoWriter(video_path+'/secondary_video.mp4', fourcc, 30.0, (secondary_width, secondary_height))
     comparison_video = cv2.VideoWriter(video_path+'/comparison_video.mp4', fourcc, 5.0, (comparison_width, comparison_height))
+    comparison_interpolation_video = cv2.VideoWriter(video_path+'/comparison_interpolation_video.mp4', fourcc, 5.0, (comparison_interpolation_width, comparison_interpolation_height))
 
     # Loop through the frames and add them to the video
     for frame_name in primary_frames:
@@ -1735,10 +2093,18 @@ def main():
         comparison_frame = cv2.imread(comparison_frame_path)
         comparison_video.write(comparison_frame)
 
+    for frame_name in comparison_interpolation_frames:
+        comparison_interpolation_frame_path = os.path.join(comparison_interpolation_frames_dir, frame_name)
+        comparison_interpolation_frame = cv2.imread(comparison_interpolation_frame_path)
+        comparison_interpolation_video.write(comparison_interpolation_frame)
+
+
     # Release the VideoWriter and close all OpenCV windows
     primary_video.release()
     secondary_video.release()
     comparison_video.release()
+    comparison_interpolation_video.release()
+    
     cv2.destroyAllWindows()
 
     print(f'Video {primary_video_filename} created successfully.')
