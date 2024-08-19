@@ -236,7 +236,7 @@ def main():
                 image = frames_folder[index]
                 current_frames_path = './frames/'+ video1 +'_frame_' + str(index) + '.jpg'
                 current_image = cv2.imread(current_frames_path)
-                print (current_frames_path)
+                #print (current_frames_path)
                 if index == number-1:
 
                                         #copying landmark for last frame
@@ -1052,7 +1052,7 @@ def main():
     highest_hand2 = 1
     #getting frame for synchronizing         
     for i in range (0 , number):
-        print(landmark_positioning_right_wrist_1[1,i])
+        #print(landmark_positioning_right_wrist_1[1,i])
 
         if landmark_positioning_right_wrist_1[0,i] <= highest_hand1:
             highest_hand1 = landmark_positioning_right_wrist_1[0,i]
@@ -1941,7 +1941,7 @@ def main():
             
         
         alpha = 0.5  # Factor for transparency
-        
+        '''
         nose_y_1 = landmark_positioning_nose_1[1,idx]
         nose_x_1 = landmark_positioning_nose_1[0,idx] 
         nose_y_2 = landmark_positioning_nose_1[1,idx+int(length_frames_folder/2)]
@@ -1952,7 +1952,17 @@ def main():
         right_ankle_x_2 = landmark_positioning_right_ankle_1[0,idx+int(length_frames_folder/2)]
         left_ankle_x_2 = landmark_positioning_left_ankle_1[0,idx+int(length_frames_folder/2)]
         right_ankle_y_2 = landmark_positioning_right_ankle_1[1,idx+int(length_frames_folder/2)]
-
+        '''
+        nose_y_1 = nose_landmark_1.y
+        nose_x_1 = nose_landmark_1.x
+        nose_y_2 = nose_landmark_2.y
+        nose_x_2 = nose_landmark_2.x
+        right_ankle_x_1 = right_ankle_landmark_1.x
+        left_ankle_x_1 = left_ankle_landmark_1.x
+        right_ankle_y_1 = right_ankle_landmark_1.y
+        right_ankle_x_2 = right_ankle_landmark_2.x
+        left_ankle_x_2 = left_ankle_landmark_2.x
+        right_ankle_y_2 = right_ankle_landmark_2.y
         #estimateing factor for stretching in width and height
 
         height_scaling_1 = nose_y_1 - right_ankle_y_1
@@ -1968,7 +1978,8 @@ def main():
             width_scaling = abs(width_scaling_1 / width_scaling_2)
         else:
             width_scaling = 1
-
+        width2 = int(width2*width_scaling)
+        height2 = int(height2*height_scaling)
         #rescaling image 2 to the corect scale
         image2 = cv2.resize(image2, (width2,height2))
 
