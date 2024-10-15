@@ -308,228 +308,7 @@ def main():
                     landmark_positioning_right_ankle_1[1,index] = right_ankle_landmark_1.y
                 
                 # Check if nose landmarks are detected in both images
-                '''
-                if nose_landmark_1 and nose_landmark_2:
-                    dx = nose_landmark_1.x - nose_landmark_2.x
-                    dy = nose_landmark_1.y - nose_landmark_2.y  
-                    counter = 0
-                    #change (interpolate) coordinates nose_landmark_between.x or y to point between nose_landmark_1.x or y und nose_landmark_2.x or y with help of counter if more than one frame is bad
-                    # Check if landmarks move unrealisticly much
-                    while dx > 0.02 or dx < -0.02 or dy > 0.02 or dy < -0.02 :
-                        counter = counter + 1
-                        if counter  == 5:
-                            print('Possibly the worst video quality ever. Try a new video.')
-                            break
-                        print('Bad nose pose detection in' + next_frames_path)
-                        if index + counter < length_frames_folder:
-                            next_frame = frames_folder[index + counter]
-                            next_frames_path = os.path.join(frames_folder_path,next_frame)
-                            next_image = cv2.imread(next_frames_path)
-                            results_2 = pose.process(cv2.cvtColor(next_image, cv2.COLOR_BGR2RGB))
-                            nose_landmark_2 = results_2.pose_landmarks.landmark[mp_pose.PoseLandmark.NOSE] if results_2.pose_landmarks else None
-                            if nose_landmark_1 and nose_landmark_2:
-                                dx = nose_landmark_1.x - nose_landmark_2.x
-                                dy = nose_landmark_1.y - nose_landmark_2.y
-                            else:
-                                print('No nose detected')
-                        else:
-                            print('Detecting bad nose frames done')
-                            break
-                        
-                    if counter  == 5:
-                            print('Possibly the worst video quality ever. Try a new video.')
-                            break 
-                    else:
-                        if counter != 0:
-                            ddx = dx / (counter+1)
-                            ddy = dy / (counter+1)
-                        for j in range(1,counter+1):
-                                landmark_positioning_nose_1[0,index+j] = landmark_positioning_nose_1[0,index+j-1]+ddx
-                                landmark_positioning_nose_1[1,index+j] = landmark_positioning_nose_1[1,index+j-1]+ddy
-                                       
-                else:
-                    print('No nose detected')
-                
-                 # Check if left wrist landmarks are detected in both images
-                if left_wrist_landmark_1 and left_wrist_landmark_2:
-                    dx = left_wrist_landmark_1.x - left_wrist_landmark_2.x
-                    dy = left_wrist_landmark_1.y - left_wrist_landmark_2.y  
-                    counter = 0
-                    
-                    # Check if landmarks move unrealisticly much
-                    while dx > 0.05 or dx < -0.05 or dy > 0.05 or dy < -0.05 :
-                        counter = counter + 1
-                        if counter  == 5:
-                            print('Possibly the worst video quality ever. Try a new video.')
-                            break
-                        print('Bad left wrist pose detection in' + next_frames_path)
-                        if index + counter < length_frames_folder:
-                            next_frame = frames_folder[index + counter]
-                            next_frames_path = os.path.join(frames_folder_path,next_frame)
-                            next_image = cv2.imread(next_frames_path)
-                            results_2 = pose.process(cv2.cvtColor(next_image, cv2.COLOR_BGR2RGB))
-                            left_wrist_landmark_2 = results_2.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_WRIST] if results_2.pose_landmarks else None
-                            if nose_landmark_1 and nose_landmark_2:
-                                dx = left_wrist_landmark_1.x - left_wrist_landmark_2.x
-                                dy = left_wrist_landmark_1.y - left_wrist_landmark_2.y
-                            else:
-                                print('No left wrist detected')
-                        else:
-                            print('Detecting bad left wrist frames done')
-                            break
-                        
-                    if counter  == 5:
-                            print('Possibly the worst video quality ever. Try a new video.')
-                            break 
-                    else:
-                        if counter != 0:
-                            ddx = dx / (counter+1)
-                            ddy = dy / (counter+1)
-                        for j in range(1,counter+1):
-                                landmark_positioning_left_wrist_1[0,index+j] = landmark_positioning_left_wrist_1[0,index+j-1]+ddx
-                                landmark_positioning_left_wrist_1[1,index+j] = landmark_positioning_left_wrist_1[1,index+j-1]+ddy
-                                       
-                else:
-                    print('No left wrist detected')
 
-
-                 # Check if right wrist landmarks are detected in both images
-                if right_wrist_landmark_1 and right_wrist_landmark_2:
-                    dx = right_wrist_landmark_1.x - right_wrist_landmark_2.x
-                    dy = right_wrist_landmark_1.y - right_wrist_landmark_2.y  
-                    counter = 0
-                    if serve:
-                        if right_wrist_landmark_1.y > highest_hand1 :
-                            highest_hand1 = right_wrist_landmark_1.x
-                            mark1 = index
-                    else:
-                        if right_wrist_landmark_1.x < highest_hand1 :
-                            highest_hand1 = right_wrist_landmark_1.x
-                            mark1 = index
-                    # Check if landmarks move unrealisticly much
-                    while dx > 0.05 or dx < -0.05 or dy > 0.05 or dy < -0.05 :
-                        counter = counter + 1
-                        if counter  == 5:
-                            print('Possibly the worst video quality ever. Try a new video.')
-                            break
-                        print('Bad right wrist pose detection in' + next_frames_path)
-                        if index + counter < length_frames_folder:
-                            next_frame = frames_folder[index + counter]
-                            next_frames_path = os.path.join(frames_folder_path,next_frame)
-                            next_image = cv2.imread(next_frames_path)
-                            results_2 = pose.process(cv2.cvtColor(next_image, cv2.COLOR_BGR2RGB))
-                            right_wrist_landmark_2 = results_2.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_WRIST] if results_2.pose_landmarks else None
-                            if nose_landmark_1 and nose_landmark_2:
-                                dx = left_wrist_landmark_1.x - left_wrist_landmark_2.x
-                                dy = left_wrist_landmark_1.y - left_wrist_landmark_2.y
-                            else:
-                                print('No right wrist detected')
-                        else:
-                            print('Detecting bad right wrist frames done')
-                            break
-                        
-                    if counter  == 5:
-                            print('Possibly the worst video quality ever. Try a new video.')
-                            break 
-                    else:
-                        if counter != 0:
-                            ddx = dx / (counter+1)
-                            ddy = dy / (counter+1)
-                        for j in range(1,counter+1):
-                                landmark_positioning_right_wrist_1[0,index+j] = landmark_positioning_right_wrist_1[0,index+j-1]+ddx
-                                landmark_positioning_right_wrist_1[1,index+j] = landmark_positioning_right_wrist_1[1,index+j-1]+ddy
-                                       
-                else:
-                    print('No right wrist detected')
-
-
-
-                 # Check if left ankle landmarks are detected in both images
-                if left_ankle_landmark_1 and left_ankle_landmark_2:
-                    dx = left_ankle_landmark_1.x - left_ankle_landmark_2.x
-                    dy = left_ankle_landmark_1.y - left_ankle_landmark_2.y  
-                    counter = 0
-                    
-                    # Check if landmarks move unrealisticly much
-                    while dx > 0.03 or dx < -0.03 or dy > 0.03 or dy < -0.03 :
-                        counter = counter + 1
-                        if counter  == 5:
-                            print('Possibly the worst video quality ever. Try a new video.')
-                            break
-                        print('Bad left ankle pose detection in' + next_frames_path)
-                        if index + counter < length_frames_folder:
-                            next_frame = frames_folder[index + counter]
-                            next_frames_path = os.path.join(frames_folder_path,next_frame)
-                            next_image = cv2.imread(next_frames_path)
-                            results_2 = pose.process(cv2.cvtColor(next_image, cv2.COLOR_BGR2RGB))
-                            left_ankle_landmark_2 = results_2.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_ANKLE] if results_2.pose_landmarks else None
-                            if nose_landmark_1 and nose_landmark_2:
-                                dx = left_ankle_landmark_1.x - left_ankle_landmark_2.x
-                                dy = left_ankle_landmark_1.y - left_ankle_landmark_2.y
-                            else:
-                                print('No left ankle detected')
-                        else:
-                            print('Detecting bad left ankle frames done')
-                            break
-                        
-                    if counter  == 5:
-                            print('Possibly the worst video quality ever. Try a new video.')
-                            break 
-                    else:
-                        if counter != 0:
-                            ddx = dx / (counter+1)
-                            ddy = dy / (counter+1)
-                        for j in range(1,counter+1):
-                                landmark_positioning_left_ankle_1[0,index+j] = landmark_positioning_left_ankle_1[0,index+j-1]+ddx
-                                landmark_positioning_left_ankle_1[1,index+j] = landmark_positioning_left_ankle_1[1,index+j-1]+ddy
-                                       
-                else:
-                    print('No left ankle detected')  
-
-
-                 # Check if right ankle landmarks are detected in both images
-                if right_ankle_landmark_1 and right_ankle_landmark_2:
-                    dx = right_ankle_landmark_1.x - right_ankle_landmark_2.x
-                    dy = right_ankle_landmark_1.y - right_ankle_landmark_2.y  
-                    counter = 0
-                    
-                    # Check if landmarks move unrealisticly much
-                    while dx > 0.03 or dx < -0.03 or dy > 0.03 or dy < -0.03 :
-                        counter = counter + 1
-                        if counter  == 5:
-                            print('Possibly the worst video quality ever. Try a new video.')
-                            break
-                        print('Bad right ankle pose detection in' + next_frames_path)
-                        if index + counter < length_frames_folder:
-                            next_frame = frames_folder[index + counter]
-                            next_frames_path = os.path.join(frames_folder_path,next_frame)
-                            next_image = cv2.imread(next_frames_path)
-                            results_2 = pose.process(cv2.cvtColor(next_image, cv2.COLOR_BGR2RGB))
-                            right_ankle_landmark_2 = results_2.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_ANKLE] if results_2.pose_landmarks else None
-                            if nose_landmark_1 and nose_landmark_2:
-                                dx = right_ankle_landmark_1.x - right_ankle_landmark_2.x
-                                dy = right_ankle_landmark_1.y - right_ankle_landmark_2.y
-                            else:
-                                print('No right ankle detected')
-                        else:
-                            print('Detecting bad right ankle frames done')
-                            break
-                        
-                    if counter  == 5:
-                            print('Possibly the worst video quality ever. Try a new video.')
-                            break 
-                    else:
-                        if counter != 0:
-                            ddx = dx / (counter+1)
-                            ddy = dy / (counter+1)
-                        for j in range(1,counter+1):
-                                landmark_positioning_right_ankle_1[0,index+j] = landmark_positioning_right_ankle_1[0,index+j-1]+ddx
-                                landmark_positioning_right_ankle_1[1,index+j] = landmark_positioning_right_ankle_1[1,index+j-1]+ddy
-                                       
-                else:
-                    print('No right ankle detected')                                        
-                '''
-                    
 
 
 
@@ -624,384 +403,369 @@ def main():
                 if landmark_positioning_right_ankle_1[0,index] == 0:
                     landmark_positioning_right_ankle_1[0,index] = right_ankle_landmark_1.x
                     landmark_positioning_right_ankle_1[1,index] = right_ankle_landmark_1.y
-                '''
-                # Check if nose landmarks are detected in both images
-                if nose_landmark_1 and nose_landmark_2:
-                    dx = nose_landmark_1.x - nose_landmark_2.x
-                    dy = nose_landmark_1.y - nose_landmark_2.y  
-                    counter = 0
-                    #change (interpolate) coordinates nose_landmark_between.x or y to point between nose_landmark_1.x or y und nose_landmark_2.x or y with help of counter if more than one frame is bad
-                    # Check if landmarks move unrealisticly much
-                    while dx > 0.02 or dx < -0.02 or dy > 0.02 or dy < -0.02 :
-                        counter = counter + 1
-                        if counter  == 5:
-                            print('Possibly the worst video quality ever. Try a new video.')
-                            break
-                        print('Bad nose pose detection in' + next_frames_path)
-                        if index + counter < length_frames_folder:
-                            next_frame = frames_folder[index + counter]
-                            next_frames_path = os.path.join(frames_folder_path,next_frame)
-                            next_image = cv2.imread(next_frames_path)
-                            results_2 = pose.process(cv2.cvtColor(next_image, cv2.COLOR_BGR2RGB))
-                            nose_landmark_2 = results_2.pose_landmarks.landmark[mp_pose.PoseLandmark.NOSE] if results_2.pose_landmarks else None
-                            if nose_landmark_1 and nose_landmark_2:
-                                dx = nose_landmark_1.x - nose_landmark_2.x
-                                dy = nose_landmark_1.y - nose_landmark_2.y
-                            else:
-                                print('No nose detected')
-                        else:
-                            print('Detecting bad nose frames done')
-                            break
-                        
-                    if counter  == 5:
-                            print('Possibly the worst video quality ever. Try a new video.')
-                            break 
-                    else:
-                        if counter != 0:
-                            ddx = dx / (counter+1)
-                            ddy = dy / (counter+1)
-                        for j in range(1,counter+1):
-                                landmark_positioning_nose_1[0,index+j] = landmark_positioning_nose_1[0,index+j-1]+ddx
-                                landmark_positioning_nose_1[1,index+j] = landmark_positioning_nose_1[1,index+j-1]+ddy
-                                       
-                else:
-                    print('No nose detected')
-                
-                 # Check if left wrist landmarks are detected in both images
-                if left_wrist_landmark_1 and left_wrist_landmark_2:
-                    dx = left_wrist_landmark_1.x - left_wrist_landmark_2.x
-                    dy = left_wrist_landmark_1.y - left_wrist_landmark_2.y  
-                    counter = 0
-                    
-                    # Check if landmarks move unrealisticly much
-                    while dx > 0.05 or dx < -0.05 or dy > 0.05 or dy < -0.05 :
-                        counter = counter + 1
-                        if counter  == 5:
-                            print('Possibly the worst video quality ever. Try a new video.')
-                            break
-                        print('Bad left wrist pose detection in' + next_frames_path)
-                        if index + counter < length_frames_folder:
-                            next_frame = frames_folder[index + counter]
-                            next_frames_path = os.path.join(frames_folder_path,next_frame)
-                            next_image = cv2.imread(next_frames_path)
-                            results_2 = pose.process(cv2.cvtColor(next_image, cv2.COLOR_BGR2RGB))
-                            left_wrist_landmark_2 = results_2.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_WRIST] if results_2.pose_landmarks else None
-                            if nose_landmark_1 and nose_landmark_2:
-                                dx = left_wrist_landmark_1.x - left_wrist_landmark_2.x
-                                dy = left_wrist_landmark_1.y - left_wrist_landmark_2.y
-                            else:
-                                print('No left wrist detected')
-                        else:
-                            print('Detecting bad left wrist frames done')
-                            break
-                        
-                    if counter  == 5:
-                            print('Possibly the worst video quality ever. Try a new video.')
-                            break 
-                    else:
-                        if counter != 0:
-                            ddx = dx / (counter+1)
-                            ddy = dy / (counter+1)
-                        for j in range(1,counter+1):
-                                landmark_positioning_left_wrist_1[0,index+j] = landmark_positioning_left_wrist_1[0,index+j-1]+ddx
-                                landmark_positioning_left_wrist_1[1,index+j] = landmark_positioning_left_wrist_1[1,index+j-1]+ddy
-                                       
-                else:
-                    print('No left wrist detected')
 
-
-                 # Check if right wrist landmarks are detected in both images
-                if right_wrist_landmark_1 and right_wrist_landmark_2:
-                    dx = right_wrist_landmark_1.x - right_wrist_landmark_2.x
-                    dy = right_wrist_landmark_1.y - right_wrist_landmark_2.y  
-                    counter = 0
-                    if right_wrist_landmark_1.x < highest_hand2 :
-                        highest_hand2 = right_wrist_landmark_1.x
-                        mark2 = index - number
-                    # Check if landmarks move unrealisticly much
-                    while dx > 0.05 or dx < -0.05 or dy > 0.05 or dy < -0.05 :
-                        counter = counter + 1
-                        if counter  == 5:
-                            print('Possibly the worst video quality ever. Try a new video.')
-                            break
-                        print('Bad right wrist pose detection in' + next_frames_path)
-                        if index + counter < length_frames_folder:
-                            next_frame = frames_folder[index + counter]
-                            next_frames_path = os.path.join(frames_folder_path,next_frame)
-                            next_image = cv2.imread(next_frames_path)
-                            results_2 = pose.process(cv2.cvtColor(next_image, cv2.COLOR_BGR2RGB))
-                            right_wrist_landmark_2 = results_2.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_WRIST] if results_2.pose_landmarks else None
-                            if nose_landmark_1 and nose_landmark_2:
-                                dx = left_wrist_landmark_1.x - left_wrist_landmark_2.x
-                                dy = left_wrist_landmark_1.y - left_wrist_landmark_2.y
-                            else:
-                                print('No right wrist detected')
-                        else:
-                            print('Detecting bad right wrist frames done')
-                            break
-                        
-                    if counter  == 5:
-                            print('Possibly the worst video quality ever. Try a new video.')
-                            break 
-                    else:
-                        if counter != 0:
-                            ddx = dx / (counter+1)
-                            ddy = dy / (counter+1)
-                        for j in range(1,counter+1):
-                                landmark_positioning_right_wrist_1[0,index+j] = landmark_positioning_right_wrist_1[0,index+j-1]+ddx
-                                landmark_positioning_right_wrist_1[1,index+j] = landmark_positioning_right_wrist_1[1,index+j-1]+ddy
-                                       
-                else:
-                    print('No right wrist detected')
-
-
-
-                 # Check if left ankle landmarks are detected in both images
-                if left_ankle_landmark_1 and left_ankle_landmark_2:
-                    dx = left_ankle_landmark_1.x - left_ankle_landmark_2.x
-                    dy = left_ankle_landmark_1.y - left_ankle_landmark_2.y  
-                    counter = 0
-                    
-                    # Check if landmarks move unrealisticly much
-                    while dx > 0.03 or dx < -0.03 or dy > 0.03 or dy < -0.03 :
-                        counter = counter + 1
-                        if counter  == 5:
-                            print('Possibly the worst video quality ever. Try a new video.')
-                            break
-                        print('Bad left ankle pose detection in' + next_frames_path)
-                        if index + counter < length_frames_folder:
-                            next_frame = frames_folder[index + counter]
-                            next_frames_path = os.path.join(frames_folder_path,next_frame)
-                            next_image = cv2.imread(next_frames_path)
-                            results_2 = pose.process(cv2.cvtColor(next_image, cv2.COLOR_BGR2RGB))
-                            left_ankle_landmark_2 = results_2.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_ANKLE] if results_2.pose_landmarks else None
-                            if nose_landmark_1 and nose_landmark_2:
-                                dx = left_ankle_landmark_1.x - left_ankle_landmark_2.x
-                                dy = left_ankle_landmark_1.y - left_ankle_landmark_2.y
-                            else:
-                                print('No left ankle detected')
-                        else:
-                            print('Detecting bad left ankle frames done')
-                            break
-                        
-                    if counter  == 5:
-                            print('Possibly the worst video quality ever. Try a new video.')
-                            break 
-                    else:
-                        if counter != 0:
-                            ddx = dx / (counter+1)
-                            ddy = dy / (counter+1)
-                        for j in range(1,counter+1):
-                                landmark_positioning_left_ankle_1[0,index+j] = landmark_positioning_left_ankle_1[0,index+j-1]+ddx
-                                landmark_positioning_left_ankle_1[1,index+j] = landmark_positioning_left_ankle_1[1,index+j-1]+ddy
-                                       
-                else:
-                    print('No left ankle detected')  
-
-
-                 # Check if right ankle landmarks are detected in both images
-                if right_ankle_landmark_1 and right_ankle_landmark_2:
-                    dx = right_ankle_landmark_1.x - right_ankle_landmark_2.x
-                    dy = right_ankle_landmark_1.y - right_ankle_landmark_2.y  
-                    counter = 0
-                    
-                    # Check if landmarks move unrealisticly much
-                    while dx > 0.03 or dx < -0.03 or dy > 0.03 or dy < -0.03 :
-                        counter = counter + 1
-                        if counter  == 5:
-                            print('Possibly the worst video quality ever. Try a new video.')
-                            break
-                        print('Bad right ankle pose detection in' + next_frames_path)
-                        if index + counter < length_frames_folder:
-                            next_frame = frames_folder[index + counter]
-                            next_frames_path = os.path.join(frames_folder_path,next_frame)
-                            next_image = cv2.imread(next_frames_path)
-                            results_2 = pose.process(cv2.cvtColor(next_image, cv2.COLOR_BGR2RGB))
-                            right_ankle_landmark_2 = results_2.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_ANKLE] if results_2.pose_landmarks else None
-                            if nose_landmark_1 and nose_landmark_2:
-                                dx = right_ankle_landmark_1.x - right_ankle_landmark_2.x
-                                dy = right_ankle_landmark_1.y - right_ankle_landmark_2.y
-                            else:
-                                print('No right ankle detected')
-                        else:
-                            print('Detecting bad right ankle frames done')
-                            break
-                        
-                    if counter  == 5:
-                            print('Possibly the worst video quality ever. Try a new video.')
-                            break 
-                    else:
-                        if counter != 0:
-                            ddx = dx / (counter+1)
-                            ddy = dy / (counter+1)
-                        for j in range(1,counter+1):
-                                landmark_positioning_right_ankle_1[0,index+j] = landmark_positioning_right_ankle_1[0,index+j-1]+ddx
-                                landmark_positioning_right_ankle_1[1,index+j] = landmark_positioning_right_ankle_1[1,index+j-1]+ddy
-                                       
-                else:
-                    print('No right ankle detected')                                        
-                '''
    
 
     #detecting bad frames and interpolating
+    bad_landmark_positioning_nose_1 = np.zeros((2,length_frames_folder),dtype = float)
+    
 
+    bad_landmark_positioning_left_wrist_1 = np.zeros((1,length_frames_folder),dtype = float)
+    
+
+    bad_landmark_positioning_right_wrist_1 = np.zeros((1,length_frames_folder),dtype = float)
+    
+
+    bad_landmark_positioning_left_ankle_1 = np.zeros((1,length_frames_folder),dtype = float)
+    
+
+    bad_landmark_positioning_right_ankle_1 = np.zeros((1,length_frames_folder),dtype = float)
+  
     #first video
     for i in range(1, number):
      #checking nose
+
+        bad_frame_counter = 1
+        if bad_landmark_positioning_nose_1[0,i-1] == 1:
+            j=i-1
+            """while bad_landmark_positioning_nose_1[0,j] == 1:
+                bad_frame_counter = bad_frame_counter + 1
+                j = j - 1"""
         value1 = landmark_positioning_nose_1[0,i]
-
-        value2 = landmark_positioning_nose_1[0,i-1]
-
+        value2 = landmark_positioning_nose_1[0,i-bad_frame_counter]
         dx = abs(value1 -value2)
         value1 = landmark_positioning_nose_1[1,i]
-
-        value2 = landmark_positioning_nose_1[1,i-1]
-
-        dy = abs(value1 - value2)
-        if dx >= 0.05 or dy >= 0.05:
-            landmark_positioning_nose_1[0,i] = (landmark_positioning_nose_1[0,i+1]+landmark_positioning_nose_1[0,i-1]) /2
-            landmark_positioning_nose_1[1,i] = (landmark_positioning_nose_1[1,i+1]+landmark_positioning_nose_1[1,i-1]) /2
-            i = i + 2
+        value2 = landmark_positioning_nose_1[1,i-bad_frame_counter]
+        dy = abs(value1 -value2)
+        if dx >= 0.05*bad_frame_counter or dy >= 0.05*bad_frame_counter:
+            #landmark_positioning_nose_1[0,i] = (landmark_positioning_nose_1[0,i+1]+landmark_positioning_nose_1[0,i-1]) /2
+            #landmark_positioning_nose_1[1,i] = (landmark_positioning_nose_1[1,i+1]+landmark_positioning_nose_1[1,i-1]) /2
+            bad_landmark_positioning_nose_1[0,i] = 1
+            
 
     #checking right wrist
     for i in range(1, number):
-        value1 = landmark_positioning_right_wrist_1[0,i]
-        value2 = landmark_positioning_right_wrist_1[0,i-1]
-        dx = abs(value1 -value2)
+    
 
+        bad_frame_counter = 1
+        if bad_landmark_positioning_right_wrist_1[0,i-1] == 1:
+            j=i-1
+            """while bad_landmark_positioning_right_wrist_1[0,j] == 1:
+                bad_frame_counter = bad_frame_counter + 1
+                j = j - 1"""
+        value1 = landmark_positioning_right_wrist_1[0,i]
+        value2 = landmark_positioning_right_wrist_1[0,i-bad_frame_counter]
+        dx = abs(value1 -value2)
         value1 = landmark_positioning_right_wrist_1[1,i]
-        value2 = landmark_positioning_right_wrist_1[1,i-1]
+        value2 = landmark_positioning_right_wrist_1[1,i-bad_frame_counter]
         dy = abs(value1 -value2)
-        if dx >= 0.05 or dy >= 0.05:
-            landmark_positioning_right_wrist_1[0,i] = (landmark_positioning_right_wrist_1[0,i+1]+landmark_positioning_right_wrist_1[0,i-1]) /2
-            landmark_positioning_right_wrist_1[1,i] = (landmark_positioning_right_wrist_1[1,i+1]+landmark_positioning_right_wrist_1[1,i-1]) /2
-            i = i + 2
+        if dx >= 0.05*bad_frame_counter or dy >= 0.05*bad_frame_counter:
+            #landmark_positioning_right_wrist_1[0,i] = (landmark_positioning_right_wrist_1[0,i+1]+landmark_positioning_right_wrist_1[0,i-1]) /2
+            #landmark_positioning_right_wrist_1[1,i] = (landmark_positioning_right_wrist_1[1,i+1]+landmark_positioning_right_wrist_1[1,i-1]) /2
+            bad_landmark_positioning_right_wrist_1[0,i] = 1
+            
         
     for i in range(1, number):    
         #checking left wrist
+        bad_frame_counter = 1
+        if bad_landmark_positioning_left_wrist_1[0,i-1] == 1:
+            j=i-1
+            """while bad_landmark_positioning_left_wrist_1[0,j] == 1:
+                bad_frame_counter = bad_frame_counter + 1
+                j = j - 1"""
         value1 = landmark_positioning_left_wrist_1[0,i]
-        value2 = landmark_positioning_left_wrist_1[0,i-1]
+        value2 = landmark_positioning_left_wrist_1[0,i-bad_frame_counter]
         dx = abs(value1 -value2)
-
         value1 = landmark_positioning_left_wrist_1[1,i]
-        value2 = landmark_positioning_left_wrist_1[1,i-1]
+        value2 = landmark_positioning_left_wrist_1[1,i-bad_frame_counter]
         dy = abs(value1 -value2)
-
-        if dx >= 0.05 or dy >=0.05:
-            landmark_positioning_left_wrist_1[0,i] = (landmark_positioning_left_wrist_1[0,i+1]+landmark_positioning_left_wrist_1[0,i-1]) /2
-            landmark_positioning_left_wrist_1[1,i] = (landmark_positioning_left_wrist_1[1,i+1]+landmark_positioning_left_wrist_1[1,i-1]) /2
-            i = i + 2
+        if dx >= 0.05*bad_frame_counter or dy >=0.05*bad_frame_counter:
+            #landmark_positioning_left_wrist_1[0,i] = (landmark_positioning_left_wrist_1[0,i+1]+landmark_positioning_left_wrist_1[0,i-1]) /2
+            #landmark_positioning_left_wrist_1[1,i] = (landmark_positioning_left_wrist_1[1,i+1]+landmark_positioning_left_wrist_1[1,i-1]) /2
+            bad_landmark_positioning_left_wrist_1[0,i] = 1
+            
 
     for i in range(1, number):
         #checking right ankle
+        bad_frame_counter = 1
+        if bad_landmark_positioning_right_ankle_1[0,i-1] == 1:
+            j=i-1
+            """while bad_landmark_positioning_right_ankle_1[0,j] == 1:
+                bad_frame_counter = bad_frame_counter + 1
+                j = j - 1"""
         value1 = landmark_positioning_right_ankle_1[0,i]
-        value2 = landmark_positioning_right_ankle_1[0,i-1]
+        value2 = landmark_positioning_right_ankle_1[0,i-bad_frame_counter]
         dx = abs(value1 -value2)
-
         value1 = landmark_positioning_right_ankle_1[1,i]
-        value2 = landmark_positioning_right_ankle_1[1,i-1]
+        value2 = landmark_positioning_right_ankle_1[1,i-bad_frame_counter]
         dy = abs(value1 -value2)
-        if dx >= 0.05 or dy >= 0.05:
-            landmark_positioning_right_ankle_1[0,i] = (landmark_positioning_right_ankle_1[0,i+1]+landmark_positioning_right_ankle_1[0,i-1]) /2
-            landmark_positioning_right_ankle_1[1,i] = (landmark_positioning_right_ankle_1[1,i+1]+landmark_positioning_right_ankle_1[1,i-1]) /2
-            i = i +2
+        if dx >= 0.05*bad_frame_counter or dy >= 0.05*bad_frame_counter:
+            #landmark_positioning_right_ankle_1[0,i] = (landmark_positioning_right_ankle_1[0,i+1]+landmark_positioning_right_ankle_1[0,i-1]) /2
+            #landmark_positioning_right_ankle_1[1,i] = (landmark_positioning_right_ankle_1[1,i+1]+landmark_positioning_right_ankle_1[1,i-1]) /2
+            bad_landmark_positioning_right_ankle_1[0,i] = 1
+            
         
      
     for i in range(1, number):    
         #checking left wrist
+        bad_frame_counter = 1
+        if bad_landmark_positioning_left_ankle_1[0,i-1] == 1:
+            j=i-1
+            """while bad_landmark_positioning_left_ankle_1[0,j] == 1:
+                bad_frame_counter = bad_frame_counter + 1
+                j = j - 1"""
         value1 = landmark_positioning_left_ankle_1[0,i]
-        value2 = landmark_positioning_left_ankle_1[0,i-1]
+        value2 = landmark_positioning_left_ankle_1[0,i-bad_frame_counter]
         dx = abs(value1 -value2)
-
         value1 = landmark_positioning_left_ankle_1[1,i]
-        value2 = landmark_positioning_left_ankle_1[1,i-1]
+        value2 = landmark_positioning_left_ankle_1[1,i-bad_frame_counter]
         dy = abs(value1 -value2)
-        if dx >= 0.05 or dy >= 0.05:
-            landmark_positioning_left_wrist_1[0,i] = (landmark_positioning_left_ankle_1[0,i+1]+landmark_positioning_left_ankle_1[0,i-1]) /2
-            landmark_positioning_left_wrist_1[1,i] = (landmark_positioning_left_ankle_1[1,i+1]+landmark_positioning_left_ankle_1[1,i-1]) /2
-            i = i +2
+        if dx >= 0.05*bad_frame_counter or dy >= 0.05*bad_frame_counter:
+            #landmark_positioning_left_wrist_1[0,i] = (landmark_positioning_left_ankle_1[0,i+1]+landmark_positioning_left_ankle_1[0,i-1]) /2
+            #landmark_positioning_left_wrist_1[1,i] = (landmark_positioning_left_ankle_1[1,i+1]+landmark_positioning_left_ankle_1[1,i-1]) /2
+            bad_landmark_positioning_left_ankle_1[0,i] = 1
+           
    
+
             
     
 
     #secondary video
     for i in range(number+1, length_frames_folder):
      #checking nose
+
+        bad_frame_counter = 1
+        if bad_landmark_positioning_nose_1[0,i-1] == 1:
+            j=i-1
+            """while bad_landmark_positioning_nose_1[0,j] == 1:
+                bad_frame_counter = bad_frame_counter + 1
+                j = j - 1"""
         value1 = landmark_positioning_nose_1[0,i]
-
-        value2 = landmark_positioning_nose_1[0,i-1]
-
+        value2 = landmark_positioning_nose_1[0,i-bad_frame_counter]
         dx = abs(value1 -value2)
         value1 = landmark_positioning_nose_1[1,i]
-
-        value2 = landmark_positioning_nose_1[1,i-1]
-
-        dy = abs(value1 - value2)
-        if dx >= 0.05 or dy >= 0.05:
-            landmark_positioning_nose_1[0,i] = (landmark_positioning_nose_1[0,i+1]+landmark_positioning_nose_1[0,i-1]) /2
-            landmark_positioning_nose_1[1,i] = (landmark_positioning_nose_1[1,i+1]+landmark_positioning_nose_1[1,i-1]) /2
-            i = i + 2
+        value2 = landmark_positioning_nose_1[1,i-bad_frame_counter]
+        dy = abs(value1 -value2)
+        if dx >= 0.05*bad_frame_counter or dy >= 0.05*bad_frame_counter:
+            #landmark_positioning_nose_1[0,i] = (landmark_positioning_nose_1[0,i+1]+landmark_positioning_nose_1[0,i-1]) /2
+            #landmark_positioning_nose_1[1,i] = (landmark_positioning_nose_1[1,i+1]+landmark_positioning_nose_1[1,i-1]) /2
+            bad_landmark_positioning_nose_1[0,i] = 1
+            
 
     #checking right wrist
     for i in range(number+1, length_frames_folder):
+    
+
+        bad_frame_counter = 1
+        if bad_landmark_positioning_right_wrist_1[0,i-1] == 1:
+            j=i-1
+            """while bad_landmark_positioning_right_wrist_1[0,j] == 1:
+                bad_frame_counter = bad_frame_counter + 1
+                j = j - 1"""
         value1 = landmark_positioning_right_wrist_1[0,i]
-        value2 = landmark_positioning_right_wrist_1[0,i-1]
+        value2 = landmark_positioning_right_wrist_1[0,i-bad_frame_counter]
         dx = abs(value1 -value2)
-
         value1 = landmark_positioning_right_wrist_1[1,i]
-        value2 = landmark_positioning_right_wrist_1[1,i-1]
+        value2 = landmark_positioning_right_wrist_1[1,i-bad_frame_counter]
         dy = abs(value1 -value2)
-        if dx >= 0.05 or dy >= 0.05:
-            landmark_positioning_right_wrist_1[0,i] = (landmark_positioning_right_wrist_1[0,i+1]+landmark_positioning_right_wrist_1[0,i-1]) /2
-            landmark_positioning_right_wrist_1[1,i] = (landmark_positioning_right_wrist_1[1,i+1]+landmark_positioning_right_wrist_1[1,i-1]) /2
-            i = i + 2
+        if dx >= 0.05 + 0.025*bad_frame_counter or dy >= 0.05+0.025*bad_frame_counter:
+            #landmark_positioning_right_wrist_1[0,i] = (landmark_positioning_right_wrist_1[0,i+1]+landmark_positioning_right_wrist_1[0,i-1]) /2
+            #landmark_positioning_right_wrist_1[1,i] = (landmark_positioning_right_wrist_1[1,i+1]+landmark_positioning_right_wrist_1[1,i-1]) /2
+            bad_landmark_positioning_right_wrist_1[0,i] = 1
+            
         
-    for i in range(number+1, length_frames_folder):    
+    for i in range(number+1, length_frames_folder):
         #checking left wrist
+        bad_frame_counter = 1
+        if bad_landmark_positioning_left_wrist_1[0,i-1] == 1:
+            j=i-1
+            """while bad_landmark_positioning_left_wrist_1[0,j] == 1:
+                bad_frame_counter = bad_frame_counter + 1
+                j = j - 1"""
         value1 = landmark_positioning_left_wrist_1[0,i]
-        value2 = landmark_positioning_left_wrist_1[0,i-1]
+        value2 = landmark_positioning_left_wrist_1[0,i-bad_frame_counter]
         dx = abs(value1 -value2)
-
         value1 = landmark_positioning_left_wrist_1[1,i]
-        value2 = landmark_positioning_left_wrist_1[1,i-1]
+        value2 = landmark_positioning_left_wrist_1[1,i-bad_frame_counter]
         dy = abs(value1 -value2)
-
-        if dx >= 0.05 or dy >=0.05:
-            landmark_positioning_left_wrist_1[0,i] = (landmark_positioning_left_wrist_1[0,i+1]+landmark_positioning_left_wrist_1[0,i-1]) /2
-            landmark_positioning_left_wrist_1[1,i] = (landmark_positioning_left_wrist_1[1,i+1]+landmark_positioning_left_wrist_1[1,i-1]) /2
-            i = i + 2
+        if dx >= 0.05*bad_frame_counter or dy >=0.05*bad_frame_counter:
+            #landmark_positioning_left_wrist_1[0,i] = (landmark_positioning_left_wrist_1[0,i+1]+landmark_positioning_left_wrist_1[0,i-1]) /2
+            #landmark_positioning_left_wrist_1[1,i] = (landmark_positioning_left_wrist_1[1,i+1]+landmark_positioning_left_wrist_1[1,i-1]) /2
+            bad_landmark_positioning_left_wrist_1[0,i] = 1
+            
 
     for i in range(number+1, length_frames_folder):
         #checking right ankle
+        bad_frame_counter = 1
+        if bad_landmark_positioning_right_ankle_1[0,i-1] == 1:
+            j=i-1
+            """while bad_landmark_positioning_right_ankle_1[0,j] == 1:
+                bad_frame_counter = bad_frame_counter + 1
+                j = j - 1"""
         value1 = landmark_positioning_right_ankle_1[0,i]
-        value2 = landmark_positioning_right_ankle_1[0,i-1]
+        value2 = landmark_positioning_right_ankle_1[0,i-bad_frame_counter]
         dx = abs(value1 -value2)
-
         value1 = landmark_positioning_right_ankle_1[1,i]
-        value2 = landmark_positioning_right_ankle_1[1,i-1]
+        value2 = landmark_positioning_right_ankle_1[1,i-bad_frame_counter]
         dy = abs(value1 -value2)
-        if dx >= 0.05 or dy >= 0.05:
-            landmark_positioning_right_ankle_1[0,i] = (landmark_positioning_right_ankle_1[0,i+1]+landmark_positioning_right_ankle_1[0,i-1]) /2
-            landmark_positioning_right_ankle_1[1,i] = (landmark_positioning_right_ankle_1[1,i+1]+landmark_positioning_right_ankle_1[1,i-1]) /2
-            i = i + 2
+        if dx >= 0.05*bad_frame_counter or dy >= 0.05*bad_frame_counter:
+            #landmark_positioning_right_ankle_1[0,i] = (landmark_positioning_right_ankle_1[0,i+1]+landmark_positioning_right_ankle_1[0,i-1]) /2
+            #landmark_positioning_right_ankle_1[1,i] = (landmark_positioning_right_ankle_1[1,i+1]+landmark_positioning_right_ankle_1[1,i-1]) /2
+            bad_landmark_positioning_right_ankle_1[0,i] = 1
+            
         
      
-    for i in range(number+1, length_frames_folder):    
+    for i in range(number+1, length_frames_folder):
         #checking left wrist
+        bad_frame_counter = 1
+        if bad_landmark_positioning_left_ankle_1[0,i-1] == 1:
+            j=i-1
+            """while bad_landmark_positioning_left_ankle_1[0,j] == 1:
+                bad_frame_counter = bad_frame_counter + 1
+                j = j - 1"""
         value1 = landmark_positioning_left_ankle_1[0,i]
-        value2 = landmark_positioning_left_ankle_1[0,i-1]
+        value2 = landmark_positioning_left_ankle_1[0,i-bad_frame_counter]
         dx = abs(value1 -value2)
-
         value1 = landmark_positioning_left_ankle_1[1,i]
-        value2 = landmark_positioning_left_ankle_1[1,i-1]
+        value2 = landmark_positioning_left_ankle_1[1,i-bad_frame_counter]
         dy = abs(value1 -value2)
-        if dx >= 0.05 or dy >= 0.05:
-            landmark_positioning_left_wrist_1[0,i] = (landmark_positioning_left_ankle_1[0,i+1]+landmark_positioning_left_ankle_1[0,i-1]) /2
-            landmark_positioning_left_wrist_1[1,i] = (landmark_positioning_left_ankle_1[1,i+1]+landmark_positioning_left_ankle_1[1,i-1]) /2
-            i = i + 2
+        if dx >= 0.05*bad_frame_counter or dy >= 0.05*bad_frame_counter:
+            #landmark_positioning_left_wrist_1[0,i] = (landmark_positioning_left_ankle_1[0,i+1]+landmark_positioning_left_ankle_1[0,i-1]) /2
+            #landmark_positioning_left_wrist_1[1,i] = (landmark_positioning_left_ankle_1[1,i+1]+landmark_positioning_left_ankle_1[1,i-1]) /2
+            bad_landmark_positioning_left_wrist_1[0,i] = 1
+            
+
+ 
+    #interpolating first video
+    for i in range(1, number-1):
+        if bad_landmark_positioning_nose_1[0,i] == 1:
+            if bad_landmark_positioning_nose_1[0,i-1] == 0:
+                bad_frame_counter = 0
+                j = i
+                while bad_landmark_positioning_nose_1[0,j] ==1 and j<number-1:
+                    bad_frame_counter = bad_frame_counter + 1
+                    j = j + 1
+                for k in range(i,j-1):
+                    landmark_positioning_nose_1[0,k] = landmark_positioning_nose_1[0,i-1] + ((k-i) / (bad_frame_counter + 1)) * (landmark_positioning_nose_1[0,j] - landmark_positioning_nose_1[0,i-1])
+                    landmark_positioning_nose_1[1,k] = landmark_positioning_nose_1[1,i-1] + ((k-i) / (bad_frame_counter + 1)) * (landmark_positioning_nose_1[1,j] - landmark_positioning_nose_1[1,i-1])
+
+    for i in range(1, number-1):
+        if bad_landmark_positioning_right_wrist_1[0,i] == 1:
+            if bad_landmark_positioning_right_wrist_1[0,i-1] == 0:
+                bad_frame_counter = 0
+                j = i
+                while bad_landmark_positioning_right_wrist_1[0,j] ==1 and j<number-1:
+                    bad_frame_counter = bad_frame_counter + 1
+                    j = j + 1
+                for k in range(i,j-1):
+                    landmark_positioning_right_wrist_1[0,k] = landmark_positioning_right_wrist_1[0,i-1] + ((k-i) / (bad_frame_counter + 1)) * (landmark_positioning_right_wrist_1[0,j] - landmark_positioning_right_wrist_1[0,i-1])
+                    landmark_positioning_right_wrist_1[1,k] = landmark_positioning_right_wrist_1[1,i-1] + ((k-i) / (bad_frame_counter + 1)) * (landmark_positioning_right_wrist_1[1,j] - landmark_positioning_right_wrist_1[1,i-1])
+
+    for i in range(1, number-1):
+        if bad_landmark_positioning_left_wrist_1[0,i] == 1:
+            if bad_landmark_positioning_left_wrist_1[0,i-1] == 0:
+                bad_frame_counter = 0
+                j = i
+                while bad_landmark_positioning_left_wrist_1[0,j] ==1 and j<number-1:
+                    bad_frame_counter = bad_frame_counter + 1
+                    j = j + 1
+                for k in range(i,j-1):
+                    landmark_positioning_left_wrist_1[0,k] = landmark_positioning_left_wrist_1[0,i-1] + ((k-i) / (bad_frame_counter + 1)) * (landmark_positioning_left_wrist_1[0,j] - landmark_positioning_left_wrist_1[0,i-1])
+                    landmark_positioning_left_wrist_1[1,k] = landmark_positioning_left_wrist_1[1,i-1] + ((k-i) / (bad_frame_counter + 1)) * (landmark_positioning_left_wrist_1[1,j] - landmark_positioning_left_wrist_1[1,i-1])
 
 
-   
+    for i in range(1, number-1):
+        if bad_landmark_positioning_right_ankle_1[0,i] == 1:
+            if bad_landmark_positioning_right_ankle_1[0,i-1] == 0:
+                bad_frame_counter = 0
+                j = i
+                while bad_landmark_positioning_right_ankle_1[0,j] ==1 and j<number-1:
+                    bad_frame_counter = bad_frame_counter + 1
+                    j = j + 1
+                for k in range(i,j-1):
+                    landmark_positioning_right_ankle_1[0,k] = landmark_positioning_right_ankle_1[0,i-1] + ((k-i) / (bad_frame_counter + 1)) * (landmark_positioning_right_ankle_1[0,j] - landmark_positioning_right_ankle_1[0,i-1])
+                    landmark_positioning_right_ankle_1[1,k] = landmark_positioning_right_ankle_1[1,i-1] + ((k-i) / (bad_frame_counter + 1)) * (landmark_positioning_right_ankle_1[1,j] - landmark_positioning_right_ankle_1[1,i-1])
+
+
+    for i in range(1, number-1):
+        if bad_landmark_positioning_left_ankle_1[0,i] == 1:
+            if bad_landmark_positioning_left_ankle_1[0,i-1] == 0:
+                bad_frame_counter = 0
+                j = i
+                while bad_landmark_positioning_left_ankle_1[0,j] ==1 and j<number-1:
+                    bad_frame_counter = bad_frame_counter + 1
+                    j = j + 1
+                for k in range(i,j-1):
+                    landmark_positioning_left_ankle_1[0,k] = landmark_positioning_left_ankle_1[0,i-1] + ((k-i) / (bad_frame_counter + 1)) * (landmark_positioning_left_ankle_1[0,j] - landmark_positioning_left_ankle_1[0,i-1])
+                    landmark_positioning_left_ankle_1[1,k] = landmark_positioning_left_ankle_1[1,i-1] + ((k-i) / (bad_frame_counter + 1)) * (landmark_positioning_left_ankle_1[1,j] - landmark_positioning_left_ankle_1[1,i-1])
+
+
+ #interpolating 2nd video
+    for i in range(number, length_frames_folder-1):
+        if bad_landmark_positioning_nose_1[0,i] == 1:
+            if bad_landmark_positioning_nose_1[0,i-1] == 0:
+                bad_frame_counter = 0
+                j = i
+                while bad_landmark_positioning_nose_1[0,j] ==1 and j<length_frames_folder-1:
+                    bad_frame_counter = bad_frame_counter + 1
+                    j = j + 1
+                for k in range(i,j-1):
+                    landmark_positioning_nose_1[0,k] = landmark_positioning_nose_1[0,i-1] + ((k-i) / (bad_frame_counter + 1)) * (landmark_positioning_nose_1[0,j] - landmark_positioning_nose_1[0,i-1])
+                    landmark_positioning_nose_1[1,k] = landmark_positioning_nose_1[1,i-1] + ((k-i) / (bad_frame_counter + 1)) * (landmark_positioning_nose_1[1,j] - landmark_positioning_nose_1[1,i-1])
+
+    for i in range(number, length_frames_folder-1):
+        if bad_landmark_positioning_right_wrist_1[0,i] == 1:
+            if bad_landmark_positioning_right_wrist_1[0,i-1] == 0:
+                bad_frame_counter = 0
+                j = i
+                while bad_landmark_positioning_right_wrist_1[0,j] ==1 and j<length_frames_folder-1:
+                    bad_frame_counter = bad_frame_counter + 1
+                    j = j + 1
+                for k in range(i,j-1):
+                    landmark_positioning_right_wrist_1[0,k] = landmark_positioning_right_wrist_1[0,i-1] + ((k-i) / (bad_frame_counter + 1)) * (landmark_positioning_right_wrist_1[0,j] - landmark_positioning_right_wrist_1[0,i-1])
+                    landmark_positioning_right_wrist_1[1,k] = landmark_positioning_right_wrist_1[1,i-1] + ((k-i) / (bad_frame_counter + 1)) * (landmark_positioning_right_wrist_1[1,j] - landmark_positioning_right_wrist_1[1,i-1])
+
+    for i in range(number, length_frames_folder-1):
+        if bad_landmark_positioning_left_wrist_1[0,i] == 1:
+            if bad_landmark_positioning_left_wrist_1[0,i-1] == 0:
+                bad_frame_counter = 0
+                j = i
+                while bad_landmark_positioning_left_wrist_1[0,j] ==1 and j<length_frames_folder-1:
+                    bad_frame_counter = bad_frame_counter + 1
+                    j = j + 1
+                for k in range(i,j-1):
+                    landmark_positioning_left_wrist_1[0,k] = landmark_positioning_left_wrist_1[0,i-1] + ((k-i) / (bad_frame_counter + 1)) * (landmark_positioning_left_wrist_1[0,j] - landmark_positioning_left_wrist_1[0,i-1])
+                    landmark_positioning_left_wrist_1[1,k] = landmark_positioning_left_wrist_1[1,i-1] + ((k-i) / (bad_frame_counter + 1)) * (landmark_positioning_left_wrist_1[1,j] - landmark_positioning_left_wrist_1[1,i-1])
+
+
+    for i in range(number, length_frames_folder-1):
+        if bad_landmark_positioning_right_ankle_1[0,i] == 1:
+            if bad_landmark_positioning_right_ankle_1[0,i-1] == 0:
+                bad_frame_counter = 0
+                j = i
+                while bad_landmark_positioning_right_ankle_1[0,j] ==1 and j<length_frames_folder-1:
+                    bad_frame_counter = bad_frame_counter + 1
+                    j = j + 1
+                for k in range(i,j-1):
+                    landmark_positioning_right_ankle_1[0,k] = landmark_positioning_right_ankle_1[0,i-1] + ((k-i) / (bad_frame_counter + 1)) * (landmark_positioning_right_ankle_1[0,j] - landmark_positioning_right_ankle_1[0,i-1])
+                    landmark_positioning_right_ankle_1[1,k] = landmark_positioning_right_ankle_1[1,i-1] + ((k-i) / (bad_frame_counter + 1)) * (landmark_positioning_right_ankle_1[1,j] - landmark_positioning_right_ankle_1[1,i-1])
+
+
+    for i in range(number, length_frames_folder-1):
+        if bad_landmark_positioning_left_ankle_1[0,i] == 1:
+            if bad_landmark_positioning_left_ankle_1[0,i-1] == 0:
+                bad_frame_counter = 0
+                j = i
+                while bad_landmark_positioning_left_ankle_1[0,j] ==1 and j<length_frames_folder-1:
+                    bad_frame_counter = bad_frame_counter + 1
+                    j = j + 1
+                for k in range(i,j-1):
+                    landmark_positioning_left_ankle_1[0,k] = landmark_positioning_left_ankle_1[0,i-1] + ((k-i) / (bad_frame_counter + 1)) * (landmark_positioning_left_ankle_1[0,j] - landmark_positioning_left_ankle_1[0,i-1])
+                    landmark_positioning_left_ankle_1[1,k] = landmark_positioning_left_ankle_1[1,i-1] + ((k-i) / (bad_frame_counter + 1)) * (landmark_positioning_left_ankle_1[1,j] - landmark_positioning_left_ankle_1[1,i-1])
+
+
+
+
 
 
     highest_hand1 = 1
@@ -2092,10 +1856,141 @@ def main():
     print(f'Video {primary_video_filename} created successfully.')
     print(f'Video {secondary_video_filename} created successfully.')
     print(f'Video {comparison_video_filename} created successfully.')
+    #trajectory for primary video
+
+    #creating vectors vor primarary video
+    half = int(length_frames_folder/2)
+    landmark_positioning_nose_1_prim = np.zeros((2,half), dtype = float)
+    landmark_positioning_right_wrist_1_prim = np.zeros((2,half), dtype= float)
+    landmark_positioning_left_wrist_1_prim = np.zeros((2,half), dtype = float)
+    landmark_positioning_right_ankle_1_prim = np.zeros((2,half), dtype = float)
+    landmark_positioning_left_ankle_1_prim = np.zeros((2,half), dtype = float)
+    for i in range(0,half):
+        landmark_positioning_nose_1_prim[0,i] =landmark_positioning_nose_1[0,i]
+        landmark_positioning_right_wrist_1_prim[0,i] =landmark_positioning_right_wrist_1[0,i] 
+        landmark_positioning_left_wrist_1_prim[0,i] =landmark_positioning_left_wrist_1[0,i] 
+        landmark_positioning_right_ankle_1_prim[0,i] =landmark_positioning_right_ankle_1[0,i] 
+        landmark_positioning_left_ankle_1_prim[0,i] = landmark_positioning_left_ankle_1[0,i] 
+
+        landmark_positioning_nose_1_prim[1,i] =1-landmark_positioning_nose_1[1,i]
+        landmark_positioning_right_wrist_1_prim[1,i] =1-landmark_positioning_right_wrist_1[1,i] 
+        landmark_positioning_left_wrist_1_prim[1,i] =1-landmark_positioning_left_wrist_1[1,i] 
+        landmark_positioning_right_ankle_1_prim[1,i] =1-landmark_positioning_right_ankle_1[1,i] 
+        landmark_positioning_left_ankle_1_prim[1,i] = 1-landmark_positioning_left_ankle_1[1,i] 
+
+    for i in range(0,half):
+        landmark_positioning_nose_1_prim[0,i] = int(landmark_positioning_nose_1_prim[0,i]*wid)
+        landmark_positioning_nose_1_prim[1,i] = int(landmark_positioning_nose_1_prim[1,i]*hgt)
+        landmark_positioning_right_wrist_1_prim[0,i] = int(landmark_positioning_right_wrist_1_prim[0,i]*wid)
+        landmark_positioning_right_wrist_1_prim[1,i] = int(landmark_positioning_right_wrist_1_prim[1,i]*hgt)
+        landmark_positioning_left_wrist_1_prim[0,i] = int(landmark_positioning_left_wrist_1_prim[0,i]*wid)
+        landmark_positioning_left_wrist_1_prim[1,i] = int(landmark_positioning_left_wrist_1_prim[1,i]*hgt)
+        landmark_positioning_right_ankle_1_prim[0,i] = int(landmark_positioning_right_ankle_1_prim[0,i]*wid)
+        landmark_positioning_right_ankle_1_prim[1,i] = int(landmark_positioning_right_ankle_1_prim[1,i]*hgt)
+        landmark_positioning_left_ankle_1_prim[0,i] = int(landmark_positioning_left_ankle_1_prim[0,i]*wid)
+        landmark_positioning_left_ankle_1_prim[1,i] = int(landmark_positioning_left_ankle_1_prim[1,i]*hgt)
 
 
+    #creating vectors for secondary video
+    
+    landmark_positioning_nose_1_sec = np.zeros((2,half), dtype = float)
+    landmark_positioning_right_wrist_1_sec = np.zeros((2,half), dtype= float)
+    landmark_positioning_left_wrist_1_sec = np.zeros((2,half), dtype = float)
+    landmark_positioning_right_ankle_1_sec = np.zeros((2,half), dtype = float)
+    landmark_positioning_left_ankle_1_sec = np.zeros((2,half), dtype = float)
+    for i in range(half,length_frames_folder):
+        landmark_positioning_nose_1_sec[0,i-half] =landmark_positioning_nose_1[0,i]
+        landmark_positioning_right_wrist_1_sec[0,i-half] =landmark_positioning_right_wrist_1[0,i] 
+        landmark_positioning_left_wrist_1_sec[0,i-half] =landmark_positioning_left_wrist_1[0,i] 
+        landmark_positioning_right_ankle_1_sec[0,i-half] =landmark_positioning_right_ankle_1[0,i] 
+        landmark_positioning_left_ankle_1_sec[0,i-half] = landmark_positioning_left_ankle_1[0,i] 
+
+        landmark_positioning_nose_1_sec[1,i-half] =1-landmark_positioning_nose_1[1,i]
+        landmark_positioning_right_wrist_1_sec[1,i-half] =1-landmark_positioning_right_wrist_1[1,i] 
+        landmark_positioning_left_wrist_1_sec[1,i-half] =1-landmark_positioning_left_wrist_1[1,i] 
+        landmark_positioning_right_ankle_1_sec[1,i-half] =1-landmark_positioning_right_ankle_1[1,i] 
+        landmark_positioning_left_ankle_1_sec[1,i-half] = 1-landmark_positioning_left_ankle_1[1,i] 
+
+    for i in range(0,half):
+        landmark_positioning_nose_1_sec[0,i] = int(landmark_positioning_nose_1_sec[0,i]*wid)
+        landmark_positioning_nose_1_sec[1,i] = int(landmark_positioning_nose_1_sec[1,i]*hgt)
+        landmark_positioning_right_wrist_1_sec[0,i] = int(landmark_positioning_right_wrist_1_sec[0,i]*wid)
+        landmark_positioning_right_wrist_1_sec[1,i] = int(landmark_positioning_right_wrist_1_sec[1,i]*hgt)
+        landmark_positioning_left_wrist_1_sec[0,i] = int(landmark_positioning_left_wrist_1_sec[0,i]*wid)
+        landmark_positioning_left_wrist_1_sec[1,i] = int(landmark_positioning_left_wrist_1_sec[1,i]*hgt)
+        landmark_positioning_right_ankle_1_sec[0,i] = int(landmark_positioning_right_ankle_1_sec[0,i]*wid)
+        landmark_positioning_right_ankle_1_sec[1,i] = int(landmark_positioning_right_ankle_1_sec[1,i]*hgt)
+        landmark_positioning_left_ankle_1_sec[0,i] = int(landmark_positioning_left_ankle_1_sec[0,i]*wid)
+        landmark_positioning_left_ankle_1_sec[1,i] = int(landmark_positioning_left_ankle_1_sec[1,i]*hgt)
 
 
+    from PIL import Image
+
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    def plot_trajectories(vectors_list, labels=None, filename='trajectories.png'):
+        
+        colors = ['blue', 'red', 'green', 'orange', 'purple']
+        
+        # Erstelle das Plot
+        plt.figure(figsize=(10, 8))
+        
+       
+        if labels is None:
+            labels = [f'Vektor {i+1}' for i in range(len(vectors_list))]
+        
+       
+        for index, vector_2xn in enumerate(vectors_list):
+
+
+            
+            x_coords = vector_2xn[0, :]
+            y_coords = vector_2xn[1, :]
+            
+            
+            color = colors[index % len(colors)]
+
+            
+            plt.plot(x_coords, y_coords, color=color, marker='o', label=labels[index])
+
+       
+        plt.title('trajectories')
+        plt.xlabel('x')
+        plt.ylabel('y')
+        plt.grid()
+        plt.legend()  
+        
+        
+        plt.savefig(filename)
+        print(f"plot saved as {filename}")
+
+       
+        plt.close()
+
+ 
+    vectors_list = [
+        landmark_positioning_nose_1_prim, 
+        landmark_positioning_right_wrist_1_prim,
+        landmark_positioning_left_wrist_1_prim,
+        landmark_positioning_right_ankle_1_prim,
+        landmark_positioning_left_ankle_1_prim
+    ]
+    labels =['nose','right wrist','left wrist','right ankle','left ankle']
+    
+    plot_trajectories(vectors_list,labels, "trajectories_primary.png")
+
+
+    vectors_list = [
+        landmark_positioning_nose_1_sec, 
+        landmark_positioning_right_wrist_1_sec,
+        landmark_positioning_left_wrist_1_sec,
+        landmark_positioning_right_ankle_1_sec,
+        landmark_positioning_left_ankle_1_sec
+    ]
+    labels =['nose','right wrist','left wrist','right ankle','left ankle']
+    
+    plot_trajectories(vectors_list,labels, "trajectories_seondary.png")
 
 # Check if this script is being run directly (not imported as a module)
 if __name__ == "__main__":
