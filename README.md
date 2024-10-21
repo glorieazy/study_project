@@ -25,7 +25,10 @@ Check that all following directories exist.
 - primary_frames_annotated
 - secondary_frames_annotated
 - segmented_frames_annotated
+- frames_annotated_interpolation
+- segmented_frames_annotated_interpolation
 
 If not, please create them. You may also create an additional "media" directory to store your videos. As paths are hard-coded at the moment, please make sure you've given the paths of your content correctly and that the directories above are in the project directory.
+Please also make sure, that the video1 and video2 are named correctly.
 
 If all packages are installed successfully running main.py should initiate a demo and yield example outcomes.
