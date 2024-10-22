@@ -18,7 +18,7 @@ def main():
     import mediapipe as mp
     from mediapipe import solutions
     from mediapipe.framework.formats import landmark_pb2
-
+    
     #########################
     ### remove old frames ###
     #########################
@@ -83,6 +83,7 @@ def main():
     # ######################
 
     #insert name of the two videos up for comparison without suffix
+    #names need to be in alphabatical order, if you want to swap videos, please change names
     video1 = 'Andi_forehand'
     video2 = 'Andriy_forehand'
 
@@ -199,28 +200,7 @@ def main():
 
     
 
-    #checking if video is serve or not
-    if 'serve' in video1:
-         if 'serve' in video2:
-              serve = True
-         else:
-              print('Please compare same type of video')
-    else:
-         if 'serve' in video2:
-              print('Please compare same type of video')
-         else:
-              serve = False
 
-    #Setting initial Values to find point for synchronizing
-    if serve:
-         highest_hand1 = 0.0
-         highest_hand2 = 0.0
-    else:
-         highest_hand1=1.0
-         highest_hand2=1.0
-
-    mark1=0
-    mark2=0
     
     # Go through frames of one video and put landmark positions in an array
     for index in range(0,number):
@@ -764,25 +744,83 @@ def main():
                     landmark_positioning_left_ankle_1[1,k] = landmark_positioning_left_ankle_1[1,i-1] + ((k-i) / (bad_frame_counter + 1)) * (landmark_positioning_left_ankle_1[1,j] - landmark_positioning_left_ankle_1[1,i-1])
 
 
+    serve = False
+    forehand = False
+    backhand = False
+    #checking if video is serve or not
+    if 'serve' in video1:
+         if 'serve' in video2:
+              serve = True
+         else:
+              print('Please compare same type of video')
+    if 'forehand' in video1:
+        if 'forehand' in video2:
+            forehand = True
+        else:
+              print('Please compare same type of video')
+    if 'backhand' in video1:
+        if 'backhand' in video2:
+            backhand = True
+        else:
+            print('Please compare same type of video')
 
 
+    #Setting initial Values to find point for synchronizing
+    if serve or forehand:
+         highest_hand1 = 1.0
+         highest_hand2 = 1.0
+    else:
+         highest_hand1=0.0
+         highest_hand2=0.0
+
+    mark1=0
+    mark2=0
 
 
-    highest_hand1 = 1
-    highest_hand2 = 1
-    #getting frame for synchronizing         
-    for i in range (0 , number):
-        #print(landmark_positioning_right_wrist_1[1,i])
+    #highest_hand1 = 1
+    #highest_hand2 = 1
+    #getting frame for synchronizing  
+    if forehand:       
+        for i in range (0 , number):
+            #print(landmark_positioning_right_wrist_1[1,i])
 
-        if landmark_positioning_right_wrist_1[0,i] <= highest_hand1:
-            highest_hand1 = landmark_positioning_right_wrist_1[0,i]
-            mark1 = i
+            if landmark_positioning_right_wrist_1[0,i] <= highest_hand1:
+                highest_hand1 = landmark_positioning_right_wrist_1[0,i]
+                mark1 = i
 
-    for i in range (number , length_frames_folder):
+        for i in range (number , length_frames_folder):
 
-        if landmark_positioning_right_wrist_1[0,i] <= highest_hand2:
-            highest_hand2 = landmark_positioning_right_wrist_1[0,i]
-            mark2 = i - number 
+            if landmark_positioning_right_wrist_1[0,i] <= highest_hand2:
+                highest_hand2 = landmark_positioning_right_wrist_1[0,i]
+                mark2 = i - number 
+    
+    if serve:
+        for i in range (0 , number):
+            #print(landmark_positioning_right_wrist_1[1,i])
+
+            if landmark_positioning_right_wrist_1[1,i] <= highest_hand1:
+                highest_hand1 = landmark_positioning_right_wrist_1[1,i]
+                mark1 = i
+
+        for i in range (number , length_frames_folder):
+
+            if landmark_positioning_right_wrist_1[0,i] <= highest_hand2:
+                highest_hand2 = landmark_positioning_right_wrist_1[0,i]
+                mark2 = i - number 
+    
+    if backhand:
+        for i in range (0 , number):
+            #print(landmark_positioning_right_wrist_1[1,i])
+
+            if landmark_positioning_right_wrist_1[1,i] >= highest_hand1:
+                highest_hand1 = landmark_positioning_right_wrist_1[1,i]
+                mark1 = i
+
+        for i in range (number , length_frames_folder):
+
+            if landmark_positioning_right_wrist_1[0,i] >= highest_hand2:
+                highest_hand2 = landmark_positioning_right_wrist_1[0,i]
+                mark2 = i - number 
 
 
     print(mark1)
